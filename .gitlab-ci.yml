@@ -1,0 +1,40 @@
+variables:
+  PACKAGE:        github.com/wikiwi/kube-volume-freezer
+  REGISTRY:       registry.intra.wikiwi.io
+  IMAGE_PREFIX:   vinh
+  DOCKER_HOST:    tcp://wikiwi__dind:2375
+  MASTER_BRANCH:  origin/master
+
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  image: golang:1.6
+  cache:
+    paths:
+      - vendor
+  before_script:
+    - make info
+    - mkdir -p /go/src/$(dirname ${PACKAGE})
+    - ln -s $(pwd) /go/src/${PACKAGE}
+    - cd /go/src/${PACKAGE} && make bootstrap
+  script:
+    - cd /go/src/${PACKAGE} && make test
+
+build:
+  stage: build
+  image: wikiwi/docker-build
+  services:
+    - wikiwi/dind
+  only:
+    - master
+  tags:
+    - sequential
+  before_script:
+    - make info
+    - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${REGISTRY}
+  script:
+    - make docker-build docker-push
+

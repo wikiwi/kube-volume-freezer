@@ -1,0 +1,5 @@
+bin
+images
+gopath
+vendor
+.glide

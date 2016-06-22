@@ -1,0 +1,141 @@
+## Start Configuration ##
+GO_PACKAGE      ?= github.com/wikiwi/kube-volume-freezer
+REGISTRY        ?= registry.wikiwi.io
+IMAGE_PREFIX    ?= vinh
+SHORT_NAME      ?= kube-volume-freezer
+## End Configuration ##
+
+# Glide Options
+GLIDE_OPTS ?=
+
+# Set branch with most current HEAD of master e.g. master or origin/master.
+MASTER_BRANCH ?= master
+
+# List of binaries to be build.
+BINARIES ?= kvf-master kvf-minion
+
+# VERSION contains the project verison e.g. v0.1.0-alpha.1
+VERSION := $(shell grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+[^\"]*" pkg/version/version.go)
+# VERSION_MINOR contains the project version up to the minor value e.g. v0.1
+VERSION_MINOR := $(shell echo ${VERSION} | grep -E -o "v[0-9]+\.[0-9]+")
+# VERSION_STAGE contains the project version stage e.g. alpha
+VERSION_STAGE := $(shell echo ${VERSION} | grep -E -o "(pre-alpha|alpha|beta|rc)")
+
+# Extract git Information of current commit.
+GIT_SHA := $(shell git rev-parse HEAD)
+GIT_SHA_SHORT := $(shell git rev-parse --short HEAD)
+GIT_SHA_MASTER := $(shell git rev-parse ${MASTER_BRANCH})
+GIT_TAG := $(shell git tag -l --contains HEAD | head -n1)
+GIT_BRANCH := $(shell git branch | grep -E '^* ' | cut -c3- )
+
+ifeq ($(GIT_SHA),$(GIT_SHA_MASTER))
+# Canary builds are all builds on the HEAD of master.
+IS_CANARY       := true
+# When current tag and project version matches, we consider this a release.
+ifeq ($(GIT_TAG),$(VERSION))
+IS_RELEASE := true
+ifeq ($(LATEST),$(VERSION_MINOR))
+IS_LATEST := true
+endif
+endif
+endif
+
+# BUILD_VERSION will be compiled into the projects binaries.
+ifdef IS_RELEASE
+BUILD_VERSION    ?= ${VERSION}
+else
+BUILD_VERSION    ?= ${VERSION}+${GIT_SHA_SHORT}
+endif
+
+# Docker Image settings.
+REPOSITORY := ${REGISTRY}/${IMAGE_PREFIX}/${SHORT_NAME}
+IMAGE := ${REPOSITORY}:${GIT_SHA_SHORT}
+IMAGE_FILE := ${SHORT_NAME}.tar.gz
+
+# Calculating image tags.
+TAGS :=
+ifeq ($(IS_CANARY),true)
+TAGS := canary ${TAGS}
+endif
+ifdef IS_RELEASE
+TAGS := ${VERSION} ${TAGS}
+ifdef VERSION_STAGE
+TAGS := ${VERSION_MINOR}-${VERSION_STAGE} ${TAGS}
+else
+TAGS := ${VERSION_MINOR} ${TAGS}
+endif
+ifeq ($(IS_LATEST),true)
+TAGS := latest ${TAGS}
+endif
+endif
+
+# Show build info.
+info:
+	@echo "Version: ${BUILD_VERSION}"
+	@echo "Image:   ${IMAGE}"
+	@echo "Tags:    ${TAGS}"
+
+# build will compile the binaries.
+.PHONY: build
+BUILD_CMD = GOBIN=$(CURDIR)/bin go install -ldflags "-X ${GO_PACKAGE}/pkg/version.Version=${BUILD_VERSION}" $(GO_PACKAGE)/cmd/${BINARY}
+build:
+	$(foreach BINARY,$(BINARIES),$(BUILD_CMD);)
+
+# docker-build will build the docker image.
+.PHONY: docker-build
+docker-build:
+	docker build --pull -t ${IMAGE} .
+
+# docker-save will save the built image.
+.PHONY: docker-save
+docker-save:
+	mkdir -p images
+	docker save ${IMAGE} | gzip > images/${IMAGE_FILE}
+
+# docker-load will load the saved docker image.
+.PHONY: docker-load
+docker-load:
+	mkdir -p images
+	gzip -cd images/${IMAGE_FILE} | docker load
+
+# docker-test will run tests inside docker container.
+.PHONY: docker-test
+docker-test:
+	docker run --rm ${IMAGE} make test
+
+# docker-push will push the previously build image.
+.PHONY: docker-push
+PUSH_CMD = docker tag ${IMAGE} ${REPOSITORY}:${TAG} && docker push ${REPOSITORY}:${TAG}
+docker-push:
+	$(foreach TAG,$(TAGS),$(PUSH_CMD);)
+
+# clean deletes build artifacts from the project.
+.PHONY: clean
+clean:
+	rm -rf bin
+	rm -rf images
+
+# test will start the project test suites.
+.PHONY: test
+test:
+	echo Running unit tests
+	cd pkg && go test ./...
+	echo Running integration tests
+	cd test && go test ./...
+
+# bootstrap will install project dependencies.
+.PHONY: bootstrap
+HAS_GLIDE := $(shell command -v glide;)
+HAS_GIT := $(shell command -v git;)
+HAS_GO := $(shell command -v go;)
+bootstrap:
+ifndef HAS_GO
+	$(error You must install Go)
+endif
+ifndef HAS_GIT
+	$(error You must install Git)
+endif
+ifndef HAS_GLIDE
+	go get -u github.com/Masterminds/glide
+endif
+	glide install ${GLIDE_OPTS}
