@@ -2,8 +2,11 @@ package fs
 
 import (
 	"os"
+	"os/exec"
 
 	"github.com/spf13/afero"
+
+	"github.com/wikiwi/kube-volume-freezer/pkg/log"
 )
 
 // FileSystem is a abstraction of the file system with minimal required
@@ -20,11 +23,27 @@ type osFS struct {
 }
 
 func (fs *osFS) Freeze(path string) error {
-	return nil
+	cmd := exec.Command("/sbin/fsfreeze", "-f", path)
+	out, err := cmd.CombinedOutput()
+	log := log.Instance().WithField("path", path).WithField("action", "freeze")
+	if len(out) > 0 {
+		log.Debugf("fsfreeze: %s", out)
+	} else {
+		log.Debugf("fsfreeze", out)
+	}
+	return err
 }
 
 func (fs *osFS) Thaw(path string) error {
-	return nil
+	cmd := exec.Command("/sbin/fsfreeze", "-u", path)
+	out, err := cmd.CombinedOutput()
+	log := log.Instance().WithField("path", path).WithField("action", "thaw")
+	if len(out) > 0 {
+		log.Debugf("fsfreeze: %s", out)
+	} else {
+		log.Debugf("fsfreeze", out)
+	}
+	return err
 }
 
 // Default returns default OS File System.
