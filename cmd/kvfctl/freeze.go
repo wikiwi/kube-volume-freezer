@@ -8,7 +8,7 @@ import (
 )
 
 type freezeCommand struct {
-	Address   string `long:"address" default:"localhost:8080" env:"KVF_ADDRESS" description:"Address of kvf-master"`
+	Address   string `long:"address" default:"http://localhost:8080" env:"KVF_ADDRESS" description:"Address of kvf-master"`
 	Namespace string `long:"namespace" default:"default" env:"KVF_NAMESPACE" description:"Namespace of Pod"`
 	Token     string `short:"t" long:"token" env:"KVF_TOKEN" description:"Use given token for api user authentication"`
 }
