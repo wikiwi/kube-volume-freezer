@@ -12,7 +12,7 @@ GLIDE_OPTS ?=
 MASTER_BRANCH ?= master
 
 # List of binaries to be build.
-BINARIES ?= kvf-master kvf-minion
+BINARIES ?= kvf-master kvf-minion kvfctl
 
 # VERSION contains the project verison e.g. v0.1.0-alpha.1
 VERSION := $(shell grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+[^\"]*" pkg/version/version.go)
