@@ -25,7 +25,7 @@ test:
 
 build:
   stage: build
-  image: wikiwi/docker-build
+  image: wikiwi/docker-build:canary
   services:
     - wikiwi/dind
   only:
