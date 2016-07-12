@@ -109,6 +109,11 @@ PUSH_CMD = docker tag ${IMAGE} ${REPOSITORY}:${TAG} && docker push ${REPOSITORY}
 docker-push:
 	$(foreach TAG,$(TAGS),$(PUSH_CMD);)
 
+.PHONY: docker-push-%
+docker-push-%:
+	$(eval TAG := $*)
+	$(PUSH_CMD)
+
 # clean deletes build artifacts from the project.
 .PHONY: clean
 clean:
