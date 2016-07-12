@@ -1,8 +1,12 @@
 package fs
 
 import (
+	"bytes"
+	"errors"
+	"io"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/spf13/afero"
 
@@ -22,31 +26,36 @@ type osFS struct {
 	afero.Afero
 }
 
-func (fs *osFS) Freeze(path string) error {
-	cmd := exec.Command("/sbin/fsfreeze", "-f", path)
-	out, err := cmd.CombinedOutput()
-	log := log.Instance().WithField("path", path).WithField("action", "freeze")
-	if len(out) > 0 {
-		log.Debugf("fsfreeze: %s", out)
+func (fs *osFS) fsfreeze(path, action string, flags ...string) error {
+	args := append(flags, path)
+	cmd := exec.Command("/sbin/fsfreeze", args...)
+	var combinedOutput bytes.Buffer
+	var errOut bytes.Buffer
+	cmd.Stdout = &combinedOutput
+	cmd.Stderr = io.MultiWriter(&combinedOutput, &errOut)
+	err := cmd.Run()
+	log := log.Instance().WithField("path", path).WithField("action", action)
+	if combinedOutput.Len() > 0 {
+		log.Debugf("fsfreeze: %s", combinedOutput.String())
 	} else {
-		log.Debugf("fsfreeze", out)
+		log.Debug("fsfreeze")
 	}
-	return err
+	if err != nil {
+		return errors.New(strings.TrimSpace(errOut.String()))
+	}
+
+	return nil
+}
+
+func (fs *osFS) Freeze(path string) error {
+	return fs.fsfreeze(path, "freeze", "-f")
 }
 
 func (fs *osFS) Thaw(path string) error {
-	cmd := exec.Command("/sbin/fsfreeze", "-u", path)
-	out, err := cmd.CombinedOutput()
-	log := log.Instance().WithField("path", path).WithField("action", "thaw")
-	if len(out) > 0 {
-		log.Debugf("fsfreeze: %s", out)
-	} else {
-		log.Debugf("fsfreeze", out)
-	}
-	return err
+	return fs.fsfreeze(path, "thaw", "-u")
 }
 
-// Default returns default OS File System.
+// New returns default OS File System.
 func New() FileSystem {
 	return &osFS{afero.Afero{Fs: afero.NewOsFs()}}
 }
