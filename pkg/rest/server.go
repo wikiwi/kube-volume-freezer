@@ -41,7 +41,7 @@ func (s *Server) Handler() http.Handler {
 
 // ListenAndServe starts the HTTP Server and blocks.
 func (s *Server) ListenAndServe(listen string) error {
-	log.Instance().Printf("start listening on %s", listen)
+	log.Instance().Printf("Start listening on %s", listen)
 	server := &http.Server{Addr: listen, Handler: s.container}
 	return server.ListenAndServe()
 }

@@ -14,6 +14,7 @@ func Instance() *logrus.Logger {
 func SetupAndHarmonize(verbose bool) {
 	restfullog.SetLogger(new(DebugLogger))
 	if verbose {
+		Instance().Info("Turn on verbose logging")
 		logrus.SetLevel(logrus.DebugLevel)
 		restful.TraceLogger(&DebugLogger{Prefix: "[restful/trace]"})
 		restful.EnableTracing(true)

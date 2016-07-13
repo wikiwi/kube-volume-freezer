@@ -1,6 +1,7 @@
 package minion
 
 import (
+	"github.com/wikiwi/kube-volume-freezer/pkg/log"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/controllers"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/fs"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/volumes"
@@ -19,6 +20,7 @@ func NewRestServer(opts *Options) (*rest.Server, error) {
 
 	var authFilter = rest.NoOpFilter
 	if len(opts.Token) > 0 {
+		log.Instance().Info("Turn on authentication")
 		authFilter = rest.NewTokenAuthFilter(opts.Token)
 	}
 

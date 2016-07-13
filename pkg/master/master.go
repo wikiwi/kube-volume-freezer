@@ -3,6 +3,7 @@ package master
 import (
 	"k8s.io/kubernetes/pkg/client/unversioned"
 
+	"github.com/wikiwi/kube-volume-freezer/pkg/log"
 	"github.com/wikiwi/kube-volume-freezer/pkg/master/controllers"
 	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes"
 	"github.com/wikiwi/kube-volume-freezer/pkg/master/volumes"
@@ -45,7 +46,12 @@ func NewRestServer(opts *Options) (*rest.Server, error) {
 
 	var authFilter = rest.NoOpFilter
 	if len(opts.Token) > 0 {
+		log.Instance().Info("Turn on authentication for clients")
 		authFilter = rest.NewTokenAuthFilter(opts.Token)
+	}
+
+	if len(opts.MinionToken) > 0 {
+		log.Instance().Info("Use token to authenticate to Minions")
 	}
 
 	server := rest.NewStandardServer()
