@@ -24,7 +24,6 @@ func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.
 		store = reflect.New(reflect.Indirect(reflect.ValueOf(exp.Entity)).Type()).Interface()
 	}
 	resp, err := client.Do(req, store)
-	fmt.Printf("%v", resp.Header)
 	if c := exp.Code; c >= 200 && c <= 299 {
 		if err != nil {
 			return fmt.Errorf("error getting response %v", err)
