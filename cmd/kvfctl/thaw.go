@@ -11,7 +11,7 @@ type thawCommand struct {
 }
 
 func (cmd *thawCommand) Execute(args []string) error {
-	if len(args) < 1 {
+	if len(args) < 2 {
 		return fmt.Errorf("Error: Please specify Pod and Volume.")
 	}
 	if len(args) > 2 {
