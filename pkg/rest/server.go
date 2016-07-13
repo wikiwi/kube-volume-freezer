@@ -13,15 +13,20 @@ type Server struct {
 	container *restful.Container
 }
 
-func NewServer() *Server {
+func NewStandardServer() *Server {
 	container := restful.NewContainer()
 	container.DoNotRecover(true)
 	container.Filter(RecoverFilter)
-	cors := restful.CrossOriginResourceSharing{AllowedHeaders: []string{"accept", "content-type"}}
-	container.Filter(cors.Filter)
+	container.Filter(LogFilter)
 	container.Filter(BlankLineFilter)
 	container.Filter(container.OPTIONSFilter)
 	container.EnableContentEncoding(true)
+	return &Server{container: container}
+}
+
+func NewServer() *Server {
+	container := restful.NewContainer()
+	container.DoNotRecover(true)
 	return &Server{container: container}
 }
 

@@ -15,7 +15,7 @@ type Options struct {
 }
 
 func NewRestServer(opts *Options) (*rest.Server, error) {
-	server := rest.NewServer()
+	server := rest.NewStandardServer()
 
 	var authFilter = rest.NoOpFilter
 	if len(opts.Token) > 0 {

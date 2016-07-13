@@ -6,6 +6,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
 	"github.com/wikiwi/kube-volume-freezer/pkg/api/errors"
 	"github.com/wikiwi/kube-volume-freezer/pkg/api/issues"
+	"github.com/wikiwi/kube-volume-freezer/pkg/log"
 	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/client"
 )
@@ -118,6 +119,7 @@ func (m *manager) getMinion(nodeName string) (*kubernetes.Minion, error) {
 	}
 
 	if minion == nil {
+		log.Instance().Errorf("Minion on Node %q not found", nodeName)
 		return nil, errors.NotFound("Minion not found").
 			Append(issues.MinionNotFound("Minion on Host %q was not found", nodeName))
 	}

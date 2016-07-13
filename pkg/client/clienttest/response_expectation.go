@@ -13,8 +13,9 @@ import (
 )
 
 type ResponseExpectation struct {
-	Code   int
-	Entity interface{}
+	Code    int
+	Entity  interface{}
+	Headers http.Header
 }
 
 func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.Request) error {
@@ -23,6 +24,7 @@ func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.
 		store = reflect.New(reflect.Indirect(reflect.ValueOf(exp.Entity)).Type()).Interface()
 	}
 	resp, err := client.Do(req, store)
+	fmt.Printf("%v", resp.Header)
 	if c := exp.Code; c >= 200 && c <= 299 {
 		if err != nil {
 			return fmt.Errorf("error getting response %v", err)
@@ -50,6 +52,12 @@ func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.
 			}
 		} else {
 			return fmt.Errorf("expected *api.Error but was %T", err)
+		}
+	}
+
+	for key, items := range exp.Headers {
+		if !reflect.DeepEqual(items, resp.Header[key]) {
+			return fmt.Errorf("expected Header %q to be %q, was %q", key, items, resp.Header[key])
 		}
 	}
 

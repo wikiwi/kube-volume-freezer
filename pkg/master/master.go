@@ -48,7 +48,7 @@ func NewRestServer(opts *Options) (*rest.Server, error) {
 		authFilter = rest.NewTokenAuthFilter(opts.Token)
 	}
 
-	server := rest.NewServer()
+	server := rest.NewStandardServer()
 	controllers.NewVolume(authFilter, volumes.NewManager(k8s, client.NewFactory(opts.MinionToken))).
 		Register(server)
 	rest.NewHealthzResource().Register(server)
