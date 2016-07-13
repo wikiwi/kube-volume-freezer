@@ -8,9 +8,6 @@ import (
 )
 
 type listCommand struct {
-	Address   string `long:"address" default:"http://localhost:8080" env:"KVF_ADDRESS" description:"Address of kvf-master"`
-	Namespace string `long:"namespace" default:"default" env:"KVF_NAMESPACE" description:"Namespace of Pod"`
-	Token     string `short:"t" long:"token" env:"KVF_TOKEN" description:"Use given token for api user authentication"`
 }
 
 func (cmd *listCommand) Execute(args []string) error {
@@ -23,18 +20,15 @@ func (cmd *listCommand) Execute(args []string) error {
 
 	podName := args[0]
 
-	if issues := validation.ValidateQualitfiedName(cmd.Namespace); len(issues) > 0 {
-		return fmt.Errorf("Error: Invalid Namespace %s", issues)
-	}
 	if issues := validation.ValidateQualitfiedName(podName); len(issues) > 0 {
 		return fmt.Errorf("Error: Invalid Pod Name %s", issues)
 	}
 
-	client, err := client.New(cmd.Address, cmd.Token, nil)
+	client, err := client.New(globalOptions.Address, globalOptions.Token, nil)
 	if err != nil {
 		return err
 	}
-	ls, err := client.Volumes().List(cmd.Namespace, podName)
+	ls, err := client.Volumes().List(globalOptions.Namespace, podName)
 	for _, item := range ls.Items {
 		fmt.Println(item)
 	}
