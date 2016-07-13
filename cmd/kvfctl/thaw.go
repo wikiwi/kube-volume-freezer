@@ -8,9 +8,6 @@ import (
 )
 
 type thawCommand struct {
-	Address   string `long:"address" default:"http://localhost:8080" env:"KVF_ADDRESS" description:"Address of kvf-master"`
-	Namespace string `long:"namespace" default:"default" env:"KVF_NAMESPACE" description:"Namespace of Pod"`
-	Token     string `short:"t" long:"token" env:"KVF_TOKEN" description:"Use given token for api user authentication"`
 }
 
 func (cmd *thawCommand) Execute(args []string) error {
@@ -23,9 +20,6 @@ func (cmd *thawCommand) Execute(args []string) error {
 
 	podName, volumeName := args[0], args[1]
 
-	if issues := validation.ValidateQualitfiedName(cmd.Namespace); len(issues) > 0 {
-		return fmt.Errorf("Error: Invalid Namespace %s", issues)
-	}
 	if issues := validation.ValidateQualitfiedName(podName); len(issues) > 0 {
 		return fmt.Errorf("Error: Invalid Pod Name %s", issues)
 	}
@@ -33,11 +27,11 @@ func (cmd *thawCommand) Execute(args []string) error {
 		return fmt.Errorf("Error: Invalid Volume Name %s", issues)
 	}
 
-	client, err := client.New(cmd.Address, cmd.Token, nil)
+	client, err := client.New(globalOptions.Address, globalOptions.Token, nil)
 	if err != nil {
 		return err
 	}
-	_, err = client.Volumes().Thaw(cmd.Namespace, podName, volumeName)
+	_, err = client.Volumes().Thaw(globalOptions.Namespace, podName, volumeName)
 	return err
 }
 
