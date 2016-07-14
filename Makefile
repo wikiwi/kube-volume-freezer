@@ -1,9 +1,8 @@
-## Start Configuration ##
+##  Configuration ##
 GO_PACKAGE      ?= github.com/wikiwi/kube-volume-freezer
 REGISTRY        ?= registry.wikiwi.io
 IMAGE_PREFIX    ?= vinh
 SHORT_NAME      ?= kube-volume-freezer
-## End Configuration ##
 
 # Glide Options
 GLIDE_OPTS ?=
@@ -27,46 +26,54 @@ GIT_SHA_SHORT := $(shell git rev-parse --short HEAD)
 GIT_SHA_MASTER := $(shell git rev-parse ${MASTER_BRANCH})
 GIT_TAG := $(shell git tag -l --contains HEAD | head -n1)
 GIT_BRANCH := $(shell git branch | grep -E '^* ' | cut -c3- )
+IS_DIRTY := $(shell git status --porcelain)
 
-ifeq ($(GIT_SHA),$(GIT_SHA_MASTER))
-# Canary builds are all builds on the HEAD of master.
-IS_CANARY       := true
-# When current tag and project version matches, we consider this a release.
-ifeq ($(GIT_TAG),$(VERSION))
-IS_RELEASE := true
-ifeq ($(LATEST),$(VERSION_MINOR))
-IS_LATEST := true
+ifndef IS_DIRTY
+  ifeq ($(GIT_SHA),$(GIT_SHA_MASTER))
+    IS_CANARY       := true
+    ifeq ($(GIT_TAG),$(VERSION))
+      IS_RELEASE      := true
+      ifeq ($(LATEST),$(VERSION_MINOR))
+        IS_LATEST := true
+      endif
+    endif
+  endif
 endif
-endif
+
+# Set build referece.
+ifdef IS_DIRTY
+  BUILD_REF      := $(GIT_SHA_SHORT)-dev
+else
+  BUILD_REF      := $(GIT_SHA_SHORT)
 endif
 
 # BUILD_VERSION will be compiled into the projects binaries.
 ifdef IS_RELEASE
-BUILD_VERSION    ?= ${VERSION}
+  BUILD_VERSION    ?= ${VERSION}
 else
-BUILD_VERSION    ?= ${VERSION}+${GIT_SHA_SHORT}
+  BUILD_VERSION    ?= ${VERSION}+${BUILD_REF}
 endif
 
 # Docker Image settings.
 REPOSITORY := ${REGISTRY}/${IMAGE_PREFIX}/${SHORT_NAME}
-IMAGE := ${REPOSITORY}:${GIT_SHA_SHORT}
+IMAGE := ${REPOSITORY}:${BUILD_REF}
 IMAGE_FILE := ${SHORT_NAME}.tar.gz
 
-# Calculating image tags.
+# Set image tags.
 TAGS :=
 ifeq ($(IS_CANARY),true)
-TAGS := canary ${TAGS}
+  TAGS := canary ${TAGS}
 endif
 ifdef IS_RELEASE
-TAGS := ${VERSION} ${TAGS}
-ifdef VERSION_STAGE
-TAGS := ${VERSION_MINOR}-${VERSION_STAGE} ${TAGS}
-else
-TAGS := ${VERSION_MINOR} ${TAGS}
-endif
-ifeq ($(IS_LATEST),true)
-TAGS := latest ${TAGS}
-endif
+  TAGS := ${VERSION} ${TAGS}
+  ifdef VERSION_STAGE
+    TAGS := ${VERSION_MINOR}-${VERSION_STAGE} ${TAGS}
+  else
+    TAGS := ${VERSION_MINOR} ${TAGS}
+  endif
+  ifeq ($(IS_LATEST),true)
+    TAGS := latest ${TAGS}
+  endif
 endif
 
 # Show build info.
