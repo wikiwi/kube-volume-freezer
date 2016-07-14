@@ -13,10 +13,10 @@ MASTER_BRANCH ?= master
 # List of binaries to be build.
 BINARIES ?= kvf-master kvf-minion kvfctl
 
-# VERSION contains the project verison e.g. v0.1.0-alpha.1
-VERSION := $(shell grep -E -o "v[0-9]+\.[0-9]+\.[0-9]+[^\"]*" pkg/version/version.go)
+# VERSION contains the project verison e.g. 0.1.0-alpha.1
+VERSION := $(shell grep -E -o "[0-9]+\.[0-9]+\.[0-9]+[^\"]*" pkg/version/version.go)
 # VERSION_MINOR contains the project version up to the minor value e.g. v0.1
-VERSION_MINOR := $(shell echo ${VERSION} | grep -E -o "v[0-9]+\.[0-9]+")
+VERSION_MINOR := $(shell echo ${VERSION} | grep -E -o "[0-9]+\.[0-9]+")
 # VERSION_STAGE contains the project version stage e.g. alpha
 VERSION_STAGE := $(shell echo ${VERSION} | grep -E -o "(pre-alpha|alpha|beta|rc)")
 
