@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/spf13/afero"
 
 	"github.com/wikiwi/kube-volume-freezer/pkg/log"
@@ -26,36 +27,39 @@ type osFS struct {
 	afero.Afero
 }
 
-func (fs *osFS) fsfreeze(path, action string, flags ...string) error {
-	args := append(flags, path)
-	cmd := exec.Command("/sbin/fsfreeze", args...)
-	var combinedOutput bytes.Buffer
-	var errOut bytes.Buffer
-	cmd.Stdout = &combinedOutput
-	cmd.Stderr = io.MultiWriter(&combinedOutput, &errOut)
-	err := cmd.Run()
-	log := log.Instance().WithField("path", path).WithField("action", action)
-	if combinedOutput.Len() > 0 {
-		log.Debugf("fsfreeze: %s", combinedOutput.String())
-	} else {
-		log.Debug("fsfreeze")
-	}
-	if err != nil {
-		return errors.New(strings.TrimSpace(errOut.String()))
-	}
-
-	return nil
-}
-
 func (fs *osFS) Freeze(path string) error {
-	return fs.fsfreeze(path, "freeze", "-f")
+	log := log.Instance().WithField("path", path).WithField("action", "freeze")
+	err := runExec(log, "/bin/sync")
+	if err != nil {
+		return err
+	}
+	return runExec(log, "/sbin/fsfreeze", "-f", path)
 }
 
 func (fs *osFS) Thaw(path string) error {
-	return fs.fsfreeze(path, "thaw", "-u")
+	log := log.Instance().WithField("path", path).WithField("action", "thaw")
+	return runExec(log, "/sbin/fsfreeze", "-u", path)
 }
 
 // New returns default OS File System.
 func New() FileSystem {
 	return &osFS{afero.Afero{Fs: afero.NewOsFs()}}
+}
+
+func runExec(log *logrus.Entry, cmd string, flags ...string) error {
+	c := exec.Command(cmd, flags...)
+	var combinedOutput bytes.Buffer
+	var errOut bytes.Buffer
+	c.Stdout = &combinedOutput
+	c.Stderr = io.MultiWriter(&combinedOutput, &errOut)
+	err := c.Run()
+	if combinedOutput.Len() > 0 {
+		log.Debugf("%s: %s", cmd, combinedOutput.String())
+	} else {
+		log.Debugf("%s", cmd)
+	}
+	if err != nil {
+		return errors.New(strings.TrimSpace(errOut.String()))
+	}
+	return nil
 }
