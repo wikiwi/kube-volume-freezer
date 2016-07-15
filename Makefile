@@ -86,7 +86,7 @@ info:
 .PHONY: build
 BUILD_CMD = GOBIN=$(CURDIR)/bin go install -ldflags "-X ${GO_PACKAGE}/pkg/version.Version=${BUILD_VERSION}" $(GO_PACKAGE)/cmd/${BINARY}
 build: clean
-	$(foreach BINARY,$(BINARIES),$(BUILD_CMD);)
+	$(foreach BINARY,$(BINARIES),($(BUILD_CMD)) || exit $$?;)
 
 # docker-build will build the docker image.
 .PHONY: docker-build
@@ -114,7 +114,7 @@ docker-test:
 .PHONY: docker-push
 PUSH_CMD = docker tag ${IMAGE} ${REPOSITORY}:${TAG} && docker push ${REPOSITORY}:${TAG}
 docker-push:
-	$(foreach TAG,$(TAGS),$(PUSH_CMD);)
+	$(foreach TAG,$(TAGS),($(PUSH_CMD)) || exit $$?;)
 
 .PHONY: docker-push-%
 docker-push-%:
