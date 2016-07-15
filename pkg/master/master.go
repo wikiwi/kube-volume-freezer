@@ -1,3 +1,4 @@
+// Package master contains the implementation of the Master Server.
 package master
 
 import (
@@ -14,13 +15,23 @@ import (
 
 // Options for starting the Master REST API Server.
 type Options struct {
-	Token           string
-	MinionToken     string
-	MinionSelector  string
-	MinionNamespace string
-	MinionPort      int
+	// Token enables token-based authentication.
+	Token string
 
-	// For testing purposes.
+	// MinionToken is the Token passed to the Minion API.
+	MinionToken string
+
+	// MinionSelector is a Kubernetes Pod Selector for finding Minion Pods.
+	// E.g. app=kube-volume-freezer,component=minion
+	MinionSelector string
+
+	// MinionNamespace is the Kubernetes Namespace of the Minion Pods.
+	MinionNamespace string
+
+	// MinionPort is the port to the Minion API Server.
+	MinionPort int
+
+	// KubeClient is used for testing purposes.
 	KubeClient unversioned.Interface
 }
 
@@ -58,8 +69,8 @@ func NewRESTServer(opts *Options) (*rest.Server, error) {
 
 	server := rest.NewStandardServer()
 	options := &client.Options{Token: opts.MinionToken}
-	controllers.NewVolume(authFilter, volumes.NewManager(k8s, client.NewFactory(options))).
-		Register(server)
+	manager := volumes.NewManager(k8s, client.NewFactory(options))
+	controllers.NewVolume(authFilter, manager).Register(server)
 	rest.NewHealthzResource().Register(server)
 
 	rest.RegisterSwagger(server)

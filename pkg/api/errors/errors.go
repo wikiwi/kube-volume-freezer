@@ -1,10 +1,11 @@
+// Package errors contains all API errors.
 package errors
 
 import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
 )
 
-// Unexpected returns a error with a 500 error code.
+// Unexpected returns an error with a 500 error code.
 func Unexpected(message string) *api.Error {
 	return &api.Error{Code: 500, Message: message}
 }
@@ -17,7 +18,7 @@ func IsUnexpected(err error) bool {
 	return false
 }
 
-// NotFound returns a error with a 404 error code.
+// NotFound returns an error with a 404 error code.
 func NotFound(message string) *api.Error {
 	return &api.Error{Code: 404, Message: message}
 }
@@ -30,7 +31,7 @@ func IsNotFound(err error) bool {
 	return false
 }
 
-// BadRequest returns a error with a 400 error code.
+// BadRequest returns an error with a 400 error code.
 // This is used when a request could not be parsed.
 func BadRequest(message string) *api.Error {
 	return &api.Error{Code: 400, Message: message}
@@ -44,7 +45,7 @@ func IsBadRequest(err error) bool {
 	return false
 }
 
-// UnprocessableEntity returns a error with a 422 error code.
+// UnprocessableEntity returns an error with a 422 error code.
 // This is used when a request contains invalid data, but could be parsed
 // syntaxtically.
 func UnprocessableEntity(message string) *api.Error {
@@ -59,7 +60,7 @@ func IsUnprocessableEntity(err error) bool {
 	return false
 }
 
-// Forbidden returns a error with a 403 error code.
+// Forbidden returns an error with a 403 error code.
 func Forbidden(message string) *api.Error {
 	return &api.Error{Code: 403, Message: message}
 }

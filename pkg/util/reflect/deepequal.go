@@ -1,3 +1,4 @@
+// Package reflect contains reflection tools.
 package reflect
 
 import (

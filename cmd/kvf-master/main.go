@@ -1,3 +1,4 @@
+// kvf-master starts the Master API Server.
 package main
 
 import (
@@ -40,7 +41,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	server, err := master.NewRestServer(&master.Options{
+	server, err := master.NewRESTServer(&master.Options{
 		Token:           opts.Token,
 		MinionToken:     opts.MinionToken,
 		MinionSelector:  opts.MinionSelector,

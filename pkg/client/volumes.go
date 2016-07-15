@@ -6,7 +6,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
 )
 
-// VolumesInterface is part of the clients Interface.
+// VolumesInterface is part of the Clients interface.
 type VolumesInterface interface {
 	Volumes() VolumesService
 }
@@ -26,7 +26,8 @@ type volumesServiceImpl struct {
 }
 
 func (v *volumesServiceImpl) List(namespace, pod string) (*api.VolumeList, error) {
-	req, err := v.client.NewRequest("GET", fmt.Sprintf("volumes/%s/%s", namespace, pod), nil)
+	addr := fmt.Sprintf("volumes/%s/%s", namespace, pod)
+	req, err := v.client.NewRequest("GET", addr, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +37,8 @@ func (v *volumesServiceImpl) List(namespace, pod string) (*api.VolumeList, error
 }
 
 func (v *volumesServiceImpl) Get(namespace, pod, volume string) (*api.Volume, error) {
-	req, err := v.client.NewRequest("GET", fmt.Sprintf("volumes/%s/%s/%s", namespace, pod, volume), nil)
+	addr := fmt.Sprintf("volumes/%s/%s/%s", namespace, pod, volume)
+	req, err := v.client.NewRequest("GET", addr, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,8 @@ func (v *volumesServiceImpl) Get(namespace, pod, volume string) (*api.Volume, er
 }
 
 func (v *volumesServiceImpl) Freeze(namespace, pod, volume string) (*api.Volume, error) {
-	req, err := v.client.NewRequest("POST", fmt.Sprintf("volumes/%s/%s/%s", namespace, pod, volume), api.FreezeThawRequest{Action: "freeze"})
+	addr := fmt.Sprintf("volumes/%s/%s/%s", namespace, pod, volume)
+	req, err := v.client.NewRequest("POST", addr, api.FreezeThawRequest{Action: "freeze"})
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +59,8 @@ func (v *volumesServiceImpl) Freeze(namespace, pod, volume string) (*api.Volume,
 }
 
 func (v *volumesServiceImpl) Thaw(namespace, pod, volume string) (*api.Volume, error) {
-	req, err := v.client.NewRequest("POST", fmt.Sprintf("volumes/%s/%s/%s", namespace, pod, volume), api.FreezeThawRequest{Action: "thaw"})
+	addr := fmt.Sprintf("volumes/%s/%s/%s", namespace, pod, volume)
+	req, err := v.client.NewRequest("POST", addr, api.FreezeThawRequest{Action: "thaw"})
 	if err != nil {
 		return nil, err
 	}

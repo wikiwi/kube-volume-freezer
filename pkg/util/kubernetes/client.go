@@ -1,3 +1,4 @@
+// Package kubernetes contains tools for interfacing with kubernetes.
 package kubernetes
 
 import (
@@ -5,7 +6,7 @@ import (
 	"k8s.io/kubernetes/pkg/client/unversioned/clientcmd"
 )
 
-// NewDefaultClient returns a new default kubernetes client.
+// NewDefaultClient returns a new default Kubernetes client.
 func NewDefaultClient() (*unversioned.Client, error) {
 	loadingRules := clientcmd.NewDefaultClientConfigLoadingRules()
 	configOverrides := &clientcmd.ConfigOverrides{}

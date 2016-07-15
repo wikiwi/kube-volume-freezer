@@ -9,17 +9,18 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/validation"
 )
 
-// Volume is a REST resource for reporting health status.
+// NewVolume creates a Volume Controller.
+func NewVolume(authFilter restful.FilterFunction, manager volumes.Manager) *Volume {
+	return &Volume{authFilter: authFilter, manager: manager}
+}
+
+// Volume is a REST Controller for the Volume Resource.
 type Volume struct {
 	authFilter restful.FilterFunction
 	manager    volumes.Manager
 }
 
-func NewVolume(authFilter restful.FilterFunction, manager volumes.Manager) *Volume {
-	return &Volume{authFilter: authFilter, manager: manager}
-}
-
-// Register adds this resource to the provided container.
+// Register adds this resource to the provided REST Server.
 func (r Volume) Register(s *rest.Server) {
 	authFilter := r.authFilter
 	if r.authFilter == nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/log"
 )
 
+// NewHealthzResource creates a new HealthzResource.
 func NewHealthzResource() *HealthzResource {
 	return &HealthzResource{}
 }
@@ -14,7 +15,7 @@ func NewHealthzResource() *HealthzResource {
 // HealthzResource is a REST resource for reporting health status.
 type HealthzResource struct{}
 
-// Register adds this resource to the provided container.
+// Register adds Resource to the provided Server.
 func (r *HealthzResource) Register(s *Server) {
 	ws := new(restful.WebService)
 	ws.Path("/healthz").

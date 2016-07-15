@@ -1,3 +1,4 @@
+// Package validation contains validation tools.
 package validation
 
 import (
@@ -13,7 +14,7 @@ func ValidateUID(uid string) (issues []string) {
 	return issues
 }
 
-// ValidateQualitfiedName validates a qualified name used in kubernetes.
+// ValidateQualitfiedName validates a Qualified Name used in Kubernetes.
 func ValidateQualitfiedName(name string) []string {
 	return validation.IsQualifiedName(name)
 }

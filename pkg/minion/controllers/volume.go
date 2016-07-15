@@ -1,3 +1,4 @@
+// Package controllers contains the REST controllers of the Minion Server.
 package controllers
 
 import (
@@ -9,17 +10,18 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/validation"
 )
 
+// NewVolume creates a Volume Controller.
 func NewVolume(authFilter restful.FilterFunction, m volumes.Manager) *Volume {
 	return &Volume{authFilter: authFilter, manager: m}
 }
 
-// Volume is a REST resource for reporting health status.
+// Volume is a REST controller for the Volume Resource.
 type Volume struct {
 	authFilter restful.FilterFunction
 	manager    volumes.Manager
 }
 
-// Register adds this resource to the provided container.
+// Register adds Volume Resource to the provided REST Server.
 func (r *Volume) Register(s *rest.Server) {
 	authFilter := r.authFilter
 	if r.authFilter == nil {

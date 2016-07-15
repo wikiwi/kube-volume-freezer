@@ -8,10 +8,12 @@ import (
 
 var _ kubernetes.Service = new(Mock)
 
+// Mock implements a Kubernetes Service Mock.
 type Mock struct {
 	mock.Mock
 }
 
+// Discover is a mocked method.
 func (m *Mock) Discover() (lst kubernetes.MinionList, err error) {
 	args := m.Called()
 	x := args.Get(0)
@@ -22,6 +24,7 @@ func (m *Mock) Discover() (lst kubernetes.MinionList, err error) {
 	return
 }
 
+// GetPodInfo is a mocked method.
 func (m *Mock) GetPodInfo(namespace string, name string) (podInfo *kubernetes.PodInfo, err error) {
 	args := m.Called(namespace, name)
 	x := args.Get(0)

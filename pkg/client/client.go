@@ -1,3 +1,4 @@
+// Package client implements a client to the kube-volume-freezer Master API.
 package client
 
 import (
@@ -7,18 +8,18 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/version"
 )
 
-// UserAgent that is sent with the HTTP Header.
+// UserAgent that is sent with the HTTP Header on each request.
 var UserAgent = "kvf/" + version.Version
 
-// Factory creates Client Instances.
+// Factory creates instances of Client.
 type Factory func(address string) (Interface, error)
 
-// Interface is the interface of the Client.
+// Interface of the Client.
 type Interface interface {
 	VolumesInterface
 }
 
-// Options used for creating a client instance.
+// Options is used for creating an instance of Client.
 type Options struct {
 	HTTPClient *http.Client
 	Token      string
@@ -32,7 +33,7 @@ type Client struct {
 	volumes VolumesService
 }
 
-// Volumes returns a Service to manipulate the Volume Resources.
+// Volumes returns a Service to manipulate Volume Resources.
 func (c *Client) Volumes() VolumesService {
 	return c.volumes
 }

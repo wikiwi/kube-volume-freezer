@@ -6,6 +6,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
 )
 
+// VolumesInterface is part of the Clients interface.
 type VolumesInterface interface {
 	Volumes() VolumesService
 }

@@ -1,3 +1,4 @@
+// Package clienttest provides utilities for testing the Minion Client.
 package clienttest
 
 import (
@@ -10,31 +11,40 @@ import (
 var _ client.Interface = new(Mock)
 var _ client.VolumesService = new(VolumesServiceMock)
 
+// Mock implements a Client Mock.
 type Mock struct {
 	VolumesMock *VolumesServiceMock
 }
 
+// Volumes returns the VolumesService Mock.
 func (m *Mock) Volumes() client.VolumesService {
 	return m.VolumesMock
 }
 
+// FactoryFake implements a Factory Fake.
 type FactoryFake struct {
+	// Clients is a static map returned during New().
+	// Key of map is the address associated with the client.
 	Clients map[string]client.Interface
 }
 
+// New returns a Client from the static map.
 func (f *FactoryFake) New(address string) (client.Interface, error) {
 	c, _ := f.Clients[address]
 	return c, nil
 }
 
+// NewMock reutrns a new instance of the Client Mock.
 func NewMock() *Mock {
 	return &Mock{VolumesMock: &VolumesServiceMock{}}
 }
 
+// VolumesServiceMock implements a VolumesService Mock.
 type VolumesServiceMock struct {
 	mock.Mock
 }
 
+// List is a mocked method.
 func (v *VolumesServiceMock) List(podUID string) (list *api.VolumeList, err error) {
 	args := v.Called(podUID)
 	x := args.Get(0)
@@ -45,6 +55,7 @@ func (v *VolumesServiceMock) List(podUID string) (list *api.VolumeList, err erro
 	return
 }
 
+// Get is a mocked method.
 func (v *VolumesServiceMock) Get(podUID string, name string) (vol *api.Volume, err error) {
 	args := v.Called(podUID, name)
 	x := args.Get(0)
@@ -55,6 +66,7 @@ func (v *VolumesServiceMock) Get(podUID string, name string) (vol *api.Volume, e
 	return
 }
 
+// Freeze is a mocked method.
 func (v *VolumesServiceMock) Freeze(podUID string, name string) (vol *api.Volume, err error) {
 	args := v.Called(podUID, name)
 	x := args.Get(0)
@@ -65,6 +77,7 @@ func (v *VolumesServiceMock) Freeze(podUID string, name string) (vol *api.Volume
 	return
 }
 
+// Thaw is a mocked method.
 func (v *VolumesServiceMock) Thaw(podUID string, name string) (vol *api.Volume, err error) {
 	args := v.Called(podUID, name)
 	x := args.Get(0)

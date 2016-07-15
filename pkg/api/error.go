@@ -5,7 +5,7 @@ func (e *Issue) Error() string {
 	return e.Message
 }
 
-// Append adds a cause to the error.
+// Append adds an Issue to Error.
 func (e *Error) Append(err *Issue) *Error {
 	e.Issues = append(e.Issues, err)
 	return e

@@ -75,7 +75,7 @@ var _ = Describe("Server", func() {
 	JustBeforeEach(func() {
 		// Setup minion.
 		fsFake = fstest.NewFake(fsFixture)
-		minionRESTServer, err := minion.NewRestServer(&minion.Options{FS: fsFake, Token: minionToken})
+		minionRESTServer, err := minion.NewRESTServer(&minion.Options{FS: fsFake, Token: minionToken})
 		if err != nil {
 			panic(err)
 		}
@@ -99,7 +99,7 @@ var _ = Describe("Server", func() {
 			}
 			return false, nil, nil
 		})
-		masterRESTServer, err := master.NewRestServer(&master.Options{
+		masterRESTServer, err := master.NewRESTServer(&master.Options{
 			Token:           masterToken,
 			MinionNamespace: minionNamespace,
 			MinionSelector:  minionSelector,

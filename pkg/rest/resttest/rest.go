@@ -8,16 +8,18 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/rest"
 )
 
+// RunTestServer starts a REST Server with given Resource.
 func RunTestServer(res rest.Resource) *httptest.Server {
 	s := rest.NewServer()
 	res.Register(s)
 	return httptest.NewServer(s.Handler())
 }
 
-func RunFilterTestServer(filter restful.FilterFunction, route restful.RouteFunction) *httptest.Server {
+// RunFilterTestServer starts a REST Server with given filter and routing "/" to routeFunc.
+func RunFilterTestServer(filter restful.FilterFunction, routeFunc restful.RouteFunction) *httptest.Server {
 	ws := new(restful.WebService)
 	ws.Path("/").Produces(restful.MIME_JSON)
-	ws.Route(ws.GET("").To(route))
+	ws.Route(ws.GET("").To(routeFunc))
 	ws.Filter(filter)
 	s := rest.NewServer()
 	s.Register(ws)

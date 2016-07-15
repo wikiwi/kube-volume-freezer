@@ -1,3 +1,4 @@
+// Package minion contains the implementation of the Minion Server.
 package minion
 
 import (
@@ -8,14 +9,17 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/rest"
 )
 
+// Options for starting the Minion REST API Server.
 type Options struct {
+	// Token enables token-based authentication.
 	Token string
 
-	// For testing purposes.
+	// FS is used for testing purposes.
 	FS fs.FileSystem
 }
 
-func NewRestServer(opts *Options) (*rest.Server, error) {
+// NewRESTServer starts the Minion REST API Server.
+func NewRESTServer(opts *Options) (*rest.Server, error) {
 	server := rest.NewStandardServer()
 
 	var authFilter = rest.NoOpFilter
@@ -29,8 +33,8 @@ func NewRestServer(opts *Options) (*rest.Server, error) {
 		f = fs.New()
 	}
 
-	controllers.NewVolume(authFilter, volumes.NewManager(f)).
-		Register(server)
+	manager := volumes.NewManager(f)
+	controllers.NewVolume(authFilter, manager).Register(server)
 	rest.NewHealthzResource().Register(server)
 	rest.RegisterSwagger(server)
 

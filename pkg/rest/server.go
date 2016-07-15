@@ -13,6 +13,7 @@ type Server struct {
 	container *restful.Container
 }
 
+// NewStandardServer returns a preconfigured full-featured REST Server.
 func NewStandardServer() *Server {
 	container := restful.NewContainer()
 	container.DoNotRecover(true)
@@ -24,12 +25,14 @@ func NewStandardServer() *Server {
 	return &Server{container: container}
 }
 
+// NewServer returns an empty REST Server.
 func NewServer() *Server {
 	container := restful.NewContainer()
 	container.DoNotRecover(true)
 	return &Server{container: container}
 }
 
+// Register adds ws to the REST container.
 func (s *Server) Register(ws *restful.WebService) {
 	s.container.Add(ws)
 }

@@ -1,3 +1,4 @@
+// Package log provides logging for the kube-volume-freezer project.
 package log
 
 import (
@@ -6,11 +7,12 @@ import (
 	restfullog "github.com/emicklei/go-restful/log"
 )
 
-// Instance returns a default logger.
+// Instance returns the default logger.
 func Instance() *logrus.Logger {
 	return logrus.StandardLogger()
 }
 
+// SetupAndHarmonize configures logging including third-party loggers.
 func SetupAndHarmonize(verbose bool) {
 	restfullog.SetLogger(new(DebugLogger))
 	if verbose {

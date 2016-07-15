@@ -12,12 +12,14 @@ import (
 	reflectutil "github.com/wikiwi/kube-volume-freezer/pkg/util/reflect"
 )
 
+// ResponseExpectation executes a HTTP request and validates its response.
 type ResponseExpectation struct {
 	Code    int
 	Entity  interface{}
 	Headers http.Header
 }
 
+// DoAndValidate executes a HTTP request and validates its response.
 func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.Request) error {
 	var store interface{}
 	if exp.Entity != nil {
@@ -30,7 +32,8 @@ func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.
 		}
 
 		if resp.StatusCode != exp.Code {
-			return fmt.Errorf("expected status code to be %d, was %d", exp.Code, resp.StatusCode)
+			return fmt.Errorf("expected status code to be %d, was %d",
+				exp.Code, resp.StatusCode)
 		}
 
 		if store != nil && !reflectutil.DeepDerivative(exp.Entity, store) {
@@ -42,12 +45,14 @@ func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.
 		}
 
 		if resp.StatusCode != exp.Code {
-			return fmt.Errorf("expected status code to be %d, was %d", exp.Code, resp.StatusCode)
+			return fmt.Errorf("expected status code to be %d, was %d",
+				exp.Code, resp.StatusCode)
 		}
 
 		if apiErr, ok := err.(*api.Error); ok {
 			if exp.Code != apiErr.Code {
-				return fmt.Errorf("expected error code to be %d, was %d", exp.Code, apiErr.Code)
+				return fmt.Errorf("expected error code to be %d, was %d",
+					exp.Code, apiErr.Code)
 			}
 		} else {
 			return fmt.Errorf("expected *api.Error but was %T", err)
@@ -56,13 +61,15 @@ func (exp *ResponseExpectation) DoAndValidate(client *generic.Client, req *http.
 
 	for key, items := range exp.Headers {
 		if !reflect.DeepEqual(items, resp.Header[key]) {
-			return fmt.Errorf("expected Header %q to be %q, was %q", key, items, resp.Header[key])
+			return fmt.Errorf("expected Header %q to be %q, was %q",
+				key, items, resp.Header[key])
 		}
 	}
 
 	return nil
 }
 
+// DoAndValidateOrDie is for convenience failing the test on error.
 func (exp *ResponseExpectation) DoAndValidateOrDie(t *testing.T, client *generic.Client, req *http.Request) {
 	err := exp.DoAndValidate(client, req)
 	if err != nil {

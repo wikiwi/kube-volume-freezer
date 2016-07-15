@@ -1,3 +1,4 @@
+// Package volumes contains the business logic of the Volume Resource.
 package volumes
 
 import (
@@ -10,10 +11,11 @@ import (
 )
 
 const (
-	// PodsBasePath is the kubelets pod folder.
+	// PodsBasePath is the Kubelets Pod folder.
 	PodsBasePath = "/var/lib/kubelet/pods"
 )
 
+// Manager contains the buisness logic for the Volume Resource.
 type Manager interface {
 	List(uid string) (*api.VolumeList, error)
 	Get(uid, volume string) (*api.Volume, error)
@@ -25,6 +27,7 @@ type manager struct {
 	fs fs.FileSystem
 }
 
+// NewManager creates a new Volume Manager.
 func NewManager(fs fs.FileSystem) Manager {
 	return &manager{fs: fs}
 }
@@ -73,7 +76,7 @@ func (m *manager) Thaw(uid, volume string) (*api.Volume, error) {
 	return &api.Volume{PodUID: uid, Name: volume}, nil
 }
 
-// resolveToAbsoultePath returns the absolute path of the volume.
+// resolveToAbsoultePath returns the absolute path of the Volume.
 func (m *manager) resolveToAbsolutePath(uid, volume string) (string, error) {
 	ls, err := m.listVolumesAbsolute(uid)
 	if err != nil {
@@ -89,8 +92,8 @@ func (m *manager) resolveToAbsolutePath(uid, volume string) (string, error) {
 	return "", er
 }
 
-// listVolumes returns all volumes of Pod. The returned values
-// are the names of the volumes.
+// listVolumes returns all Volumes of Pod. The returned values
+// are the names of the Volumes.
 func (m *manager) listVolumes(uid string) ([]string, error) {
 	ls, err := m.listVolumesAbsolute(uid)
 	if err != nil {
@@ -103,8 +106,8 @@ func (m *manager) listVolumes(uid string) ([]string, error) {
 	return ret, nil
 }
 
-// listVolumes returns all volumes of Pod. The returned values
-// are absolute paths to the volume folder.
+// listVolumes returns all Volumes of Pod. The returned values
+// are absolute paths to the Volume folder.
 func (m *manager) listVolumesAbsolute(uid string) ([]string, error) {
 	podVolumesFolder := PodsBasePath + "/" + uid + "/volumes"
 

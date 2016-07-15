@@ -1,3 +1,4 @@
+// Package fs contains the code for interfacing with the file system.
 package fs
 
 import (

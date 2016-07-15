@@ -1,3 +1,4 @@
+// Package kubernetes contains the code for interfacing with Kubernetes.
 package kubernetes
 
 import (
@@ -17,16 +18,22 @@ type Minion struct {
 // MinionList is a list of discovered Minions.
 type MinionList []*Minion
 
+// PodInfo is a struct with some details of a Pod.
 type PodInfo struct {
 	UID      string
 	NodeName string
 }
 
+// Service is an interface for interaction with Kubernetes.
 type Service interface {
+	// Discover returns a list of Minions.
 	Discover() (MinionList, error)
+
+	// GetPodInfo returns additional details of a Pod.
 	GetPodInfo(namespace string, name string) (*PodInfo, error)
 }
 
+// DiscoveryConfig includes necessary data for the discovery of Minions.
 type DiscoveryConfig struct {
 	Namespace string
 	Selector  string
@@ -34,6 +41,7 @@ type DiscoveryConfig struct {
 	Port      int
 }
 
+// NewService returns a new Service instance.
 func NewService(client unversioned.Interface, cfg *DiscoveryConfig) (Service, error) {
 	sel, err := labels.Parse(cfg.Selector)
 	if err != nil {

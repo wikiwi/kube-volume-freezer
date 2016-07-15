@@ -1,3 +1,4 @@
+// Package issues contains all issues that can be included in API errors.
 package issues
 
 import (

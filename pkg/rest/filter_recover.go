@@ -11,7 +11,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/log"
 )
 
-// RecoverFilter captures a panic and responds with standard API error.
+// RecoverFilter captures a panic and responds with an API Error.
 func RecoverFilter(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
 	defer func() {
 		if r := recover(); r != nil {

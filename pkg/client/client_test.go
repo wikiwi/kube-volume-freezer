@@ -1,10 +1,24 @@
 package client
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/wikiwi/kube-volume-freezer/pkg/version"
 )
+
+func ExampleClient() {
+	c := NewOrDie("http://kube-volume-freezer:8080", &Options{Token: "token"})
+
+	list, err := c.Volumes().List("default", "podName")
+	if err != nil {
+		panic(err)
+	}
+
+	for _, volume := range list.Items {
+		fmt.Println(volume)
+	}
+}
 
 func TestUserAgent(t *testing.T) {
 	c := NewOrDie("http://localhost", nil)

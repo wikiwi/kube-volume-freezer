@@ -1,3 +1,4 @@
+// Package generic contains the shared Client code of the Minion and Master Client.
 package generic
 
 import (
@@ -15,21 +16,16 @@ const (
 	mediaType = "application/json"
 )
 
-// Client is a generic client.
+// Client implements a generic basic client for consuming the projects REST API.
 type Client struct {
-	Client  *http.Client
+	// Client is the native HTTP client all requests get delegated to.
+	Client *http.Client
+
+	// BaseURL is the base URL for relative paths.
 	BaseURL *url.URL
 
 	// Headers that are set on each request.
 	Headers map[string]string
-}
-
-func (c *Client) NewRequestOrDie(method, urlStr string, body interface{}) *http.Request {
-	req, err := c.NewRequest(method, urlStr, body)
-	if err != nil {
-		panic(err)
-	}
-	return req
 }
 
 // NewRequest creates an API Request to urlStr which can be a relative string.
@@ -63,9 +59,19 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	return req, nil
 }
 
-// Do sends an API request and returns the API response. The API response is JSON decoded and stored in the value
-// pointed to by v, or returned as an error if an API error has occurred.
-func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+// NewRequestOrDie is the same as NewRequest but panics on error.
+func (c *Client) NewRequestOrDie(method, urlStr string, body interface{}) *http.Request {
+	req, err := c.NewRequest(method, urlStr, body)
+	if err != nil {
+		panic(err)
+	}
+	return req
+}
+
+// Do sends an API request and returns the API response. If decodeTo is set, the response body will
+// be decoded (expects JSON) into the variable. This method automatically parses an API error and
+// returns the error.
+func (c *Client) Do(req *http.Request, decodeTo interface{}) (*http.Response, error) {
 	resp, err := c.Client.Do(req)
 	if err != nil {
 		return nil, err
@@ -82,8 +88,8 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 		return resp, err
 	}
 
-	if v != nil {
-		err := json.NewDecoder(resp.Body).Decode(v)
+	if decodeTo != nil {
+		err := json.NewDecoder(resp.Body).Decode(decodeTo)
 		if err != nil {
 			return nil, err
 		}
@@ -110,7 +116,7 @@ func CheckResponse(r *http.Response) error {
 	return &apiError
 }
 
-//New returns a new Client.
+// New returns a new Client.
 func New(address string, httpClient *http.Client) (*Client, error) {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
@@ -124,6 +130,7 @@ func New(address string, httpClient *http.Client) (*Client, error) {
 	return c, nil
 }
 
+// NewOrDie is the same as New but panics on error.
 func NewOrDie(address string, httpClient *http.Client) *Client {
 	c, err := New(address, httpClient)
 	if err != nil {

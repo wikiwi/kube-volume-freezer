@@ -1,3 +1,4 @@
+// kvf-minion starts the Minion API Server.
 package main
 
 import (

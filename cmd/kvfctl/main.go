@@ -1,3 +1,4 @@
+// kvfctl is a command line client to the Master API Server.
 package main
 
 import (

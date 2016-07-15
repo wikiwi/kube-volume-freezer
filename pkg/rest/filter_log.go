@@ -10,7 +10,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/log"
 )
 
-// LogFilter is a simple No-Op filter for go-restful.
+// LogFilter enriches the log with requenst/response data.
 func LogFilter(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
 	log.Instance().Debugf("Processing %s %s", req.Request.Method, req.Request.RequestURI)
 	origWriter := resp.ResponseWriter

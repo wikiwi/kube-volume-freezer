@@ -1,3 +1,4 @@
+// Package volumes contains the business logic of the Volume Resource.
 package volumes
 
 import (
@@ -11,6 +12,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/client"
 )
 
+// Manager contains the buisness logic for the Volume Resource.
 type Manager interface {
 	List(namespace, pod string) (*api.VolumeList, error)
 	Get(namespace, pod, volume string) (*api.Volume, error)
@@ -23,6 +25,7 @@ type manager struct {
 	clientFactory client.Factory
 }
 
+// NewManager creates a new Volumes Manager.
 func NewManager(k kubernetes.Service, cf client.Factory) Manager {
 	return &manager{kubernetes: k, clientFactory: cf}
 }

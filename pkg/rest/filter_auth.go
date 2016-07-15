@@ -24,14 +24,13 @@ func (f *tokenAuthFilter) Filter(req *restful.Request, resp *restful.Response, c
 	chain.ProcessFilter(req, resp)
 }
 
+// NewTokenAuthFilter only allows requests with the Header 'Authorization: "Bearer token"'.
 func NewTokenAuthFilter(token string) restful.FilterFunction {
 	f := &tokenAuthFilter{token}
 	return f.Filter
 }
 
-// NewTokenAuthFilter returns a filter implementing authorization
-// based on a static token.
-
+// ForbiddenFilter blocks all requests.
 func ForbiddenFilter(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
 	er := errors.Forbidden("Unauthorized")
 	err := resp.WriteHeaderAndEntity(er.Code, er)

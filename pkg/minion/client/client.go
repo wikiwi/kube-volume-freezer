@@ -1,3 +1,4 @@
+// Package client implements a client to the kube-volume-freezer Minion API.
 package client
 
 import (
@@ -7,20 +8,24 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/version"
 )
 
+// UserAgent that is sent with the HTTP Header on each request.
 var UserAgent = "kvf/" + version.Version
 
+// Factory creates instances of Client.
 type Factory func(address string) (Interface, error)
 
+// Interface of the Client.
 type Interface interface {
 	VolumesInterface
 }
 
+// Options is used for creating an instance of Client.
 type Options struct {
 	HTTPClient *http.Client
 	Token      string
 }
 
-// Client to the minion API.
+// Client performs requests to the Minion API.
 type Client struct {
 	*generic.Client
 
@@ -28,6 +33,7 @@ type Client struct {
 	volumes VolumesService
 }
 
+// Volumes returns a Service to manipulate Volume Resources.
 func (c *Client) Volumes() VolumesService {
 	return c.volumes
 }
@@ -41,7 +47,7 @@ func NewOrDie(address string, opts *Options) *Client {
 	return c
 }
 
-//New returns a new Client.
+// New returns a new Client.
 func New(address string, opts *Options) (*Client, error) {
 	if opts == nil {
 		opts = new(Options)
@@ -59,6 +65,7 @@ func New(address string, opts *Options) (*Client, error) {
 	return c, nil
 }
 
+// NewFactory returns a new Factory.
 func NewFactory(options *Options) Factory {
 	return func(address string) (Interface, error) {
 		c, err := New(address, options)
