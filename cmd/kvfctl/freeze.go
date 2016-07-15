@@ -27,7 +27,8 @@ func (cmd *freezeCommand) Execute(args []string) error {
 		return fmt.Errorf("Error: Invalid Volume Name %s", issues)
 	}
 
-	client, err := client.New(globalOptions.Address, globalOptions.Token, nil)
+	options := &client.Options{Token: globalOptions.Token}
+	client, err := client.New(globalOptions.Address, options)
 	if err != nil {
 		return err
 	}

@@ -1,8 +1,6 @@
 package clienttest
 
 import (
-	"net/http"
-
 	"github.com/stretchr/testify/mock"
 
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
@@ -24,7 +22,7 @@ type FactoryFake struct {
 	Clients map[string]client.Interface
 }
 
-func (f *FactoryFake) New(address string, httpClient *http.Client) (client.Interface, error) {
+func (f *FactoryFake) New(address string) (client.Interface, error) {
 	c, _ := f.Clients[address]
 	return c, nil
 }

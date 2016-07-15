@@ -89,7 +89,7 @@ func (m *manager) retrieveClient(nodeName string) (client.Interface, error) {
 		return nil, err
 	}
 
-	return m.clientFactory(minion.Address, nil)
+	return m.clientFactory(minion.Address)
 }
 
 func (m *manager) getPodInfo(namespace, pod string) (*kubernetes.PodInfo, error) {

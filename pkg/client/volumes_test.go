@@ -14,7 +14,7 @@ import (
 func setup() (*Client, *httptest.Server, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	c := NewOrDie(server.URL, "", nil)
+	c := NewOrDie(server.URL, nil)
 	return c, server, mux
 }
 

@@ -112,7 +112,7 @@ var _ = Describe("Server", func() {
 		}
 		masterServer = httptest.NewServer(masterRESTServer.Handler())
 
-		client, err = clientpkg.New(masterServer.URL, clientToken, nil)
+		client, err = clientpkg.New(masterServer.URL, &clientpkg.Options{Token: clientToken})
 		if err != nil {
 			panic(err)
 		}

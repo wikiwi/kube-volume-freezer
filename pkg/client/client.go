@@ -7,15 +7,24 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/version"
 )
 
+// UserAgent that is sent with the HTTP Header.
 var UserAgent = "kvf/" + version.Version
 
-type Factory func(address string, httpClient *http.Client) (Interface, error)
+// Factory creates Client Instances.
+type Factory func(address string) (Interface, error)
 
+// Interface is the interface of the Client.
 type Interface interface {
 	VolumesInterface
 }
 
-// Client to the master API.
+// Options used for creating a client instance.
+type Options struct {
+	HTTPClient *http.Client
+	Token      string
+}
+
+// Client performs requests to the Master API.
 type Client struct {
 	*generic.Client
 
@@ -23,37 +32,42 @@ type Client struct {
 	volumes VolumesService
 }
 
+// Volumes returns a Service to manipulate the Volume Resources.
 func (c *Client) Volumes() VolumesService {
 	return c.volumes
 }
 
-// NewOrDie is like New but panics upon error
-func NewOrDie(address string, token string, httpClient *http.Client) *Client {
-	c, err := New(address, token, httpClient)
+// New returns a new Client.
+func New(address string, opts *Options) (*Client, error) {
+	if opts == nil {
+		opts = new(Options)
+	}
+	g, err := generic.New(address, opts.HTTPClient)
+	if err != nil {
+		return nil, err
+	}
+	c := &Client{Client: g}
+	c.Headers["User-Agent"] = UserAgent
+	if opts.Token != "" {
+		c.Headers["Authorization"] = "Bearer " + opts.Token
+	}
+	c.volumes = &volumesServiceImpl{client: c}
+	return c, nil
+}
+
+// NewOrDie is like New but panics upon error.
+func NewOrDie(address string, opts *Options) *Client {
+	c, err := New(address, opts)
 	if err != nil {
 		panic(err)
 	}
 	return c
 }
 
-//New returns a new Client.
-func New(address string, token string, httpClient *http.Client) (*Client, error) {
-	g, err := generic.New(address, httpClient)
-	if err != nil {
-		return nil, err
-	}
-	c := &Client{Client: g}
-	c.Headers["User-Agent"] = UserAgent
-	if token != "" {
-		c.Headers["Authorization"] = "Bearer " + token
-	}
-	c.volumes = &volumesServiceImpl{client: c}
-	return c, nil
-}
-
-func NewFactory(token string) Factory {
-	return func(address string, httpClient *http.Client) (Interface, error) {
-		c, err := New(address, token, httpClient)
+// NewFactory returns a new Factory.
+func NewFactory(opts *Options) Factory {
+	return func(address string) (Interface, error) {
+		c, err := New(address, opts)
 		return c, err
 	}
 }

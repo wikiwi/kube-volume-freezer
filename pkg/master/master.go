@@ -12,6 +12,7 @@ import (
 	utilk8s "github.com/wikiwi/kube-volume-freezer/pkg/util/kubernetes"
 )
 
+// Options for starting the Master REST API Server.
 type Options struct {
 	Token           string
 	MinionToken     string
@@ -23,7 +24,8 @@ type Options struct {
 	KubeClient unversioned.Interface
 }
 
-func NewRestServer(opts *Options) (*rest.Server, error) {
+// NewRESTServer starts the Master REST API Server.
+func NewRESTServer(opts *Options) (*rest.Server, error) {
 	kubeClient := opts.KubeClient
 	if kubeClient == nil {
 		var err error
@@ -55,7 +57,8 @@ func NewRestServer(opts *Options) (*rest.Server, error) {
 	}
 
 	server := rest.NewStandardServer()
-	controllers.NewVolume(authFilter, volumes.NewManager(k8s, client.NewFactory(opts.MinionToken))).
+	options := &client.Options{Token: opts.MinionToken}
+	controllers.NewVolume(authFilter, volumes.NewManager(k8s, client.NewFactory(options))).
 		Register(server)
 	rest.NewHealthzResource().Register(server)
 

@@ -9,10 +9,15 @@ import (
 
 var UserAgent = "kvf/" + version.Version
 
-type Factory func(address string, httpClient *http.Client) (Interface, error)
+type Factory func(address string) (Interface, error)
 
 type Interface interface {
 	VolumesInterface
+}
+
+type Options struct {
+	HTTPClient *http.Client
+	Token      string
 }
 
 // Client to the minion API.
@@ -28,8 +33,8 @@ func (c *Client) Volumes() VolumesService {
 }
 
 // NewOrDie is like New but panics upon error
-func NewOrDie(address string, token string, httpClient *http.Client) *Client {
-	c, err := New(address, token, httpClient)
+func NewOrDie(address string, opts *Options) *Client {
+	c, err := New(address, opts)
 	if err != nil {
 		panic(err)
 	}
@@ -37,23 +42,26 @@ func NewOrDie(address string, token string, httpClient *http.Client) *Client {
 }
 
 //New returns a new Client.
-func New(address string, token string, httpClient *http.Client) (*Client, error) {
-	g, err := generic.New(address, httpClient)
+func New(address string, opts *Options) (*Client, error) {
+	if opts == nil {
+		opts = new(Options)
+	}
+	g, err := generic.New(address, opts.HTTPClient)
 	if err != nil {
 		return nil, err
 	}
 	c := &Client{Client: g}
 	c.Headers["User-Agent"] = UserAgent
-	if token != "" {
-		c.Headers["Authorization"] = "Bearer " + token
+	if opts.Token != "" {
+		c.Headers["Authorization"] = "Bearer " + opts.Token
 	}
 	c.volumes = &volumesServiceImpl{client: c}
 	return c, nil
 }
 
-func NewFactory(token string) Factory {
-	return func(address string, httpClient *http.Client) (Interface, error) {
-		c, err := New(address, token, httpClient)
+func NewFactory(options *Options) Factory {
+	return func(address string) (Interface, error) {
+		c, err := New(address, options)
 		return c, err
 	}
 }

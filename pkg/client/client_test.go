@@ -7,7 +7,7 @@ import (
 )
 
 func TestUserAgent(t *testing.T) {
-	c := NewOrDie("http://localhost", "", nil)
+	c := NewOrDie("http://localhost", nil)
 	r, err := c.NewRequest("GET", "relative", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -19,7 +19,7 @@ func TestUserAgent(t *testing.T) {
 }
 
 func TestAuthorizationHeader(t *testing.T) {
-	c := NewOrDie("http://localhost", "token", nil)
+	c := NewOrDie("http://localhost", &Options{Token: "token"})
 	r, err := c.NewRequest("GET", "relative", nil)
 	if err != nil {
 		t.Fatal(err)

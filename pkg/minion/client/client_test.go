@@ -12,7 +12,7 @@ import (
 func setup() (*client.Client, *httptest.Server, *http.ServeMux) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
-	c := client.NewOrDie(server.URL, "", nil)
+	c := client.NewOrDie(server.URL, nil)
 	return c, server, mux
 }
 
@@ -23,7 +23,7 @@ func testMethod(t *testing.T, r *http.Request, expected string) {
 }
 
 func TestUserAgent(t *testing.T) {
-	c := client.NewOrDie("http://localhost", "", nil)
+	c := client.NewOrDie("http://localhost", nil)
 	r, err := c.NewRequest("GET", "relative", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -35,7 +35,7 @@ func TestUserAgent(t *testing.T) {
 }
 
 func TestAuthorizationHeader(t *testing.T) {
-	c := client.NewOrDie("http://localhost", "token", nil)
+	c := client.NewOrDie("http://localhost", &client.Options{Token: "token"})
 	r, err := c.NewRequest("GET", "relative", nil)
 	if err != nil {
 		t.Fatal(err)

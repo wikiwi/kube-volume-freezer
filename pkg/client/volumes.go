@@ -6,11 +6,12 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
 )
 
+// VolumesInterface is part of the clients Interface.
 type VolumesInterface interface {
 	Volumes() VolumesService
 }
 
-// VolumesService is an interface for interacting with volumes in the minion API.
+// VolumesService is an interface for interacting with Volumes in the Master API.
 type VolumesService interface {
 	List(namespace, pod string) (*api.VolumeList, error)
 	Get(namespace, pod, volume string) (*api.Volume, error)
