@@ -85,7 +85,7 @@ info:
 # build will compile the binaries.
 .PHONY: build
 BUILD_CMD = GOBIN=$(CURDIR)/bin go install -ldflags "-X ${GO_PACKAGE}/pkg/version.Version=${BUILD_VERSION}" $(GO_PACKAGE)/cmd/${BINARY}
-build:
+build: clean
 	$(foreach BINARY,$(BINARIES),$(BUILD_CMD);)
 
 # docker-build will build the docker image.
@@ -125,7 +125,6 @@ docker-push-%:
 .PHONY: clean
 clean:
 	rm -rf bin
-	rm -rf images
 
 # test will start the project test suites.
 .PHONY: test
