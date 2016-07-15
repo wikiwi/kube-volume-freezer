@@ -36,7 +36,7 @@ func main() {
 		fmt.Println(version.Version)
 		os.Exit(0)
 	}
-	server, err := minion.NewRestServer(&minion.Options{
+	server, err := minion.NewRESTServer(&minion.Options{
 		Token: opts.Token,
 	})
 	if err != nil {
