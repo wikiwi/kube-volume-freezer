@@ -1,130 +1,99 @@
-##  Configuration ##
+###  Configuration ###
 GO_PACKAGE      ?= github.com/wikiwi/kube-volume-freezer
-REGISTRY        ?= registry.wikiwi.io
-IMAGE_PREFIX    ?= vinh
-SHORT_NAME      ?= kube-volume-freezer
+REPOSITORY      ?= registry.wikiwi.io/vinh/kube-volume-freezer
+
+### Build Tools ###
+GO ?= go
+GLIDE ?= glide
+GIT ?= git
+DOCKER ?= docker
+TAR ?= tar
+ZIP ?= zip
+SHA256SUM ?= sha256sum
 
 # Glide Options
 GLIDE_OPTS ?=
 
+### Artifact settings for Github Release ###
+ARTIFACTS_ARCHIVES ?= kvfctl_linux_amd64.tar.bz2 \
+                      kvfctl_darwin_amd64.tar.bz2 \
+                      kvfctl_freebsd_amd64.tar.bz2 \
+                      kvfctl_windows_amd64.zip
+
+ARTIFACTS_TARGETS := $(ARTIFACTS_ARCHIVES:%=artifacts/%) artifacts/SHA256SUMS
+
+### CI Settings ###
 # Set branch with most current HEAD of master e.g. master or origin/master.
+# E.g. Gitlab doesn't pull the master branch but fetches it to origin/master.
 MASTER_BRANCH ?= master
 
-# List of binaries to be build.
-BINARIES ?= kvf-master kvf-minion kvfctl
+### Environment ###
+HAS_GLIDE := $(shell command -v ${GLIDE};)
+HAS_GIT := $(shell command -v ${GIT};)
+HAS_GO := $(shell command -v ${GO};)
+GOOS := $(shell ${GO} env GOOS)
+GOARCH := $(shell ${GO} env GOARCH)
+BINARIES := $(notdir $(wildcard cmd/*))
 
-# VERSION contains the project verison e.g. 0.1.0-alpha.1
-VERSION := $(shell grep -E -o "[0-9]+\.[0-9]+\.[0-9]+[^\"]*" pkg/version/version.go)
-# VERSION_MINOR contains the project version up to the minor value e.g. v0.1
-VERSION_MINOR := $(shell echo ${VERSION} | grep -E -o "[0-9]+\.[0-9]+")
-# VERSION_STAGE contains the project version stage e.g. alpha
-VERSION_STAGE := $(shell echo ${VERSION} | grep -E -o "(pre-alpha|alpha|beta|rc)")
+# Load versioning logic.
+include versioning.mk
 
-# Extract git Information of current commit.
-GIT_SHA := $(shell git rev-parse HEAD)
-GIT_SHA_SHORT := $(shell git rev-parse --short HEAD)
-GIT_SHA_MASTER := $(shell git rev-parse ${MASTER_BRANCH})
-GIT_TAG := $(shell git tag -l --contains HEAD | head -n1)
-GIT_BRANCH := $(shell git branch | grep -E '^* ' | cut -c3- )
-IS_DIRTY := $(shell git status --porcelain)
-
-ifndef IS_DIRTY
-  ifeq ($(GIT_SHA),$(GIT_SHA_MASTER))
-    IS_CANARY       := true
-    ifeq ($(GIT_TAG),$(VERSION))
-      IS_RELEASE      := true
-      ifeq ($(LATEST),$(VERSION_MINOR))
-        IS_LATEST := true
-      endif
-    endif
-  endif
-endif
-
-# Set build referece.
-ifdef IS_DIRTY
-  BUILD_REF      := $(GIT_SHA_SHORT)-dev
-else
-  BUILD_REF      := $(GIT_SHA_SHORT)
-endif
-
-# BUILD_VERSION will be compiled into the projects binaries.
-ifdef IS_RELEASE
-  BUILD_VERSION    ?= ${VERSION}
-else
-  BUILD_VERSION    ?= ${VERSION}+${BUILD_REF}
-endif
-
-# Docker Image settings.
-REPOSITORY := ${REGISTRY}/${IMAGE_PREFIX}/${SHORT_NAME}
+# Docker Image info.
 IMAGE := ${REPOSITORY}:${BUILD_REF}
-IMAGE_FILE := ${SHORT_NAME}.tar.gz
-
-# Set image tags.
-TAGS :=
-ifeq ($(IS_CANARY),true)
-  TAGS := canary ${TAGS}
-endif
-ifdef IS_RELEASE
-  TAGS := ${VERSION} ${TAGS}
-  ifdef VERSION_STAGE
-    TAGS := ${VERSION_MINOR}-${VERSION_STAGE} ${TAGS}
-  else
-    TAGS := ${VERSION_MINOR} ${TAGS}
-  endif
-  ifeq ($(IS_LATEST),true)
-    TAGS := latest ${TAGS}
-  endif
-endif
 
 # Show build info.
 info:
+	@echo $(shell echo $0)
 	@echo "Version: ${BUILD_VERSION}"
 	@echo "Image:   ${IMAGE}"
 	@echo "Tags:    ${TAGS}"
 
-# build will compile the binaries.
+# Creating compressed artifacts from binaries.
+artifacts/%.tar.bz2:
+	$(eval FILE := bin/$(word 2,$(subst _, ,$*))/$(word 3,$(subst _, ,$*))/$(word 1,$(subst _, ,$*)))
+	${MAKE} ${FILE}
+	mkdir -p artifacts
+	${TAR} -jcvf "$@" ${FILE}
+artifacts/%.zip:
+	$(eval FILE := bin/$(word 2,$(subst _, ,$*))/$(word 3,$(subst _, ,$*))/$(word 1,$(subst _, ,$*)).exe)
+	${MAKE} ${FILE}
+	mkdir -p artifacts
+	${ZIP} "$@" "${FILE}"
+
+artifacts/SHA256SUMS:
+	cd artifacts && ${SHA256SUM} ${ARTIFACTS_ARCHIVES} > $(notdir $@)
+
 .PHONY: build
-BUILD_CMD = GOBIN=$(CURDIR)/bin go install -ldflags "-X ${GO_PACKAGE}/pkg/version.Version=${BUILD_VERSION}" $(GO_PACKAGE)/cmd/${BINARY}
-build: clean
-	$(foreach BINARY,$(BINARIES),($(BUILD_CMD)) || exit $$?;)
+ifneq (${GOOS}, "windows")
+build: ${BINARIES:%=bin/${GOOS}/${GOARCH}/%}
+else
+build: ${BINARIES:%=bin/${GOOS}/${GOARCH}/%.exe}
+endif
+
+.PHONY: build-cross
+build-cross: ${BINARIES:%=build-cross-%}
+build-cross-%: bin/linux/amd64/% bin/freebsd/amd64/% bin/darwin/amd64/% bin/windows/amd64/%.exe
+	$(NOOP)
 
 # docker-build will build the docker image.
 .PHONY: docker-build
 docker-build:
-	docker build --pull -t ${IMAGE} .
+	${DOCKER} build --pull -t ${IMAGE} .
 
-# docker-save will save the built image.
-.PHONY: docker-save
-docker-save:
-	mkdir -p images
-	docker save ${IMAGE} | gzip > images/${IMAGE_FILE}
-
-# docker-load will load the saved docker image.
-.PHONY: docker-load
-docker-load:
-	mkdir -p images
-	gzip -cd images/${IMAGE_FILE} | docker load
-
-# docker-test will run tests inside docker container.
-.PHONY: docker-test
-docker-test:
-	docker run --rm ${IMAGE} make test
-
-# docker-push will push the previously build image.
+# docker-push will push all tags to the repository
 .PHONY: docker-push
-PUSH_CMD = docker tag ${IMAGE} ${REPOSITORY}:${TAG} && docker push ${REPOSITORY}:${TAG}
-docker-push:
-	$(foreach TAG,$(TAGS),($(PUSH_CMD)) || exit $$?;)
-
-.PHONY: docker-push-%
+docker-push: ${TAGS:%=docker-push-%}
 docker-push-%:
-	$(eval TAG := $*)
-	$(PUSH_CMD)
+	${DOCKER} tag ${IMAGE} ${REPOSITORY}:$* && docker push ${REPOSITORY}:$*
+
+# artifacts create
+.PHONY: artifacts
+artifacts: ${ARTIFACTS_TARGETS}
 
 # clean deletes build artifacts from the project.
 .PHONY: clean
 clean:
-	rm -rf bin
+	rm -rf bin artifacts
 
 # test will start the project test suites.
 .PHONY: test
@@ -136,9 +105,6 @@ test:
 
 # bootstrap will install project dependencies.
 .PHONY: bootstrap
-HAS_GLIDE := $(shell command -v glide;)
-HAS_GIT := $(shell command -v git;)
-HAS_GO := $(shell command -v go;)
 bootstrap:
 ifndef HAS_GO
 	$(error You must install Go)
@@ -147,6 +113,9 @@ ifndef HAS_GIT
 	$(error You must install Git)
 endif
 ifndef HAS_GLIDE
-	go get -u github.com/Masterminds/glide
+	${GO} get -u github.com/Masterminds/glide
 endif
-	glide install ${GLIDE_OPTS}
+	${GLIDE} install ${GLIDE_OPTS}
+
+include build.mk
+
