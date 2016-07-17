@@ -1,3 +1,8 @@
+# Copyright (C) 2016 wikiwi.io
+#
+# This software may be modified and distributed under the terms
+# of the MIT license. See the LICENSE file for details.
+
 # go build targets
 #
 BUILD_CMD = CGO_ENABLED=0 ${GO} build -ldflags "-X ${GO_PACKAGE}/pkg/version.Version=${BUILD_VERSION}" -o "$@" $(GO_PACKAGE)/cmd/$(basename $(notdir $@))

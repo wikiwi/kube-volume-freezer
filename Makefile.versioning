@@ -1,3 +1,8 @@
+# Copyright (C) 2016 wikiwi.io
+#
+# This software may be modified and distributed under the terms
+# of the MIT license. See the LICENSE file for details.
+
 # VERSION contains the project verison e.g. 0.1.0-alpha.1
 VERSION := $(shell grep -E -o "[0-9]+\.[0-9]+\.[0-9]+[^\"]*" pkg/version/version.go)
 # VERSION_MINOR contains the project version up to the minor value e.g. v0.1

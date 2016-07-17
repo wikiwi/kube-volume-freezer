@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2016 wikiwi.io
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license. See the LICENSE file for details.
+ */
+
 // kvfctl is a command line client to the Master API Server.
 package main
 

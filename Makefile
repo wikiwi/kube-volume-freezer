@@ -1,3 +1,8 @@
+# Copyright (C) 2016 wikiwi.io
+#
+# This software may be modified and distributed under the terms
+# of the MIT license. See the LICENSE file for details.
+
 ###  Configuration ###
 GO_PACKAGE      ?= github.com/wikiwi/kube-volume-freezer
 REPOSITORY      ?= registry.wikiwi.io/vinh/kube-volume-freezer
@@ -37,14 +42,13 @@ GOARCH := $(shell ${GO} env GOARCH)
 BINARIES := $(notdir $(wildcard cmd/*))
 
 # Load versioning logic.
-include versioning.mk
+include Makefile.versioning
 
 # Docker Image info.
 IMAGE := ${REPOSITORY}:${BUILD_REF}
 
 # Show build info.
 info:
-	@echo $(shell echo $0)
 	@echo "Version: ${BUILD_VERSION}"
 	@echo "Image:   ${IMAGE}"
 	@echo "Tags:    ${TAGS}"
@@ -121,5 +125,5 @@ ifndef HAS_GLIDE
 endif
 	${GLIDE} ${GLIDE_GLOBAL_OPTS} install ${GLIDE_OPTS}
 
-include build.mk
+include Makefile.build
 
