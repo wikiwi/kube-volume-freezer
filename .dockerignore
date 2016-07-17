@@ -1,5 +1,3 @@
-bin
-images
-gopath
-vendor
-.glide
+bin/
+vendor/
+!bin/linux/amd64/*

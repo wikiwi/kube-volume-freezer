@@ -75,10 +75,13 @@ build-cross: ${BINARIES:%=build-cross-%}
 build-cross-%: bin/linux/amd64/% bin/freebsd/amd64/% bin/darwin/amd64/% bin/windows/amd64/%.exe
 	$(NOOP)
 
+.PHONY: build-for-docker
+build-for-docker: ${BINARIES:%= bin/linux/amd64/%}
+
 # docker-build will build the docker image.
 .PHONY: docker-build
-docker-build:
-	${DOCKER} build --pull -t ${IMAGE} .
+docker-build: build-for-docker
+	${DOCKER} build --pull -t ${IMAGE} -f Dockerfile.alpine .
 
 # docker-push will push all tags to the repository
 .PHONY: docker-push
