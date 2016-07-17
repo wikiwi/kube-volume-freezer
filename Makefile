@@ -13,6 +13,7 @@ SHA256SUM ?= sha256sum
 
 # Glide Options
 GLIDE_OPTS ?=
+GLIDE_GLOBAL_OPTS ?=
 
 ### Artifact settings for Github Release ###
 ARTIFACTS_ARCHIVES ?= kvfctl_linux_amd64.tar.bz2 \
@@ -118,7 +119,7 @@ endif
 ifndef HAS_GLIDE
 	${GO} get -u github.com/Masterminds/glide
 endif
-	${GLIDE} install ${GLIDE_OPTS}
+	${GLIDE} ${GLIDE_GLOBAL_OPTS} install ${GLIDE_OPTS}
 
 include build.mk
 
