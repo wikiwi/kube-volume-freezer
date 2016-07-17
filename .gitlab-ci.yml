@@ -1,30 +1,33 @@
 variables:
-  PACKAGE:        github.com/wikiwi/kube-volume-freezer
-  REGISTRY:       registry.intra.wikiwi.io
-  IMAGE_PREFIX:   vinh
-  DOCKER_HOST:    tcp://wikiwi__dind:2375
-  MASTER_BRANCH:  origin/master
+  GO_PACKAGE:    github.com/wikiwi/kube-volume-freezer
+  REPOSITORY:    registry.intra.wikiwi.io/vinh/kube-volume-freezer
+  DOCKER_HOST:   tcp://wikiwi__dind:2375
+  MASTER_BRANCH: origin/master
 
 stages:
-  - test
-  - build
+  - test-and-build
+  - registry
 
-test:
-  stage: test
+test-and-build:
+  stage: test-and-build
   image: golang:1.6
+  artifacts:
+    paths:
+      - bin/
+    expire_in: 1 week
   cache:
     paths:
       - vendor
   before_script:
     - make info
-    - mkdir -p /go/src/$(dirname ${PACKAGE})
-    - ln -s $(pwd) /go/src/${PACKAGE}
-    - cd /go/src/${PACKAGE} && make bootstrap
+    - mkdir -p /go/src/$(dirname ${GO_PACKAGE})
+    - ln -s $(pwd) /go/src/${GO_PACKAGE}
+    - cd /go/src/${GO_PACKAGE} && make bootstrap
   script:
-    - cd /go/src/${PACKAGE} && make test
+    - cd /go/src/${GO_PACKAGE} && make test build-for-docker
 
-build:
-  stage: build
+push-image-to-registry:
+  stage: registry
   image: wikiwi/docker-build:canary
   services:
     - wikiwi/dind
@@ -34,7 +37,7 @@ build:
     - sequential
   before_script:
     - make info
-    - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} ${REGISTRY}
+    - docker login -u gitlab-ci-token -p ${CI_BUILD_TOKEN} registry.intra.wikiwi.io
   script:
     - make docker-build docker-push
 
