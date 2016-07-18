@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: kube-volume-freezer-minion
+spec:
+  template:
+    metadata:
+      labels:
+        app: kube-volume-freezer
+        component: minion
+    spec:
+      containers:
+      - name: minion
+        image: wikiwi/kube-volume-freezer:0.1
+        command: ['kvf-minion']
+        ports:
+        - containerPort: 8080
+        securityContext:
+          capabilities:
+            add: ['SYS_ADMIN']
+        volumeMounts:
+        - mountPath: /var/lib/kubelet/pods
+          name: pods
+          readOnly: true
+        env:
+        - name: KVF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: kube-volume-freezer-secret
+              key: minion-token
+      volumes:
+      - hostPath:
+          path: /var/lib/kubelet/pods
+        name: pods
+
