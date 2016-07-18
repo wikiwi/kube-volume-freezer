@@ -18,6 +18,7 @@ spec:
         command: ['kvf-master']
         ports:
         - containerPort: 8080
+          name: http
         env:
         - name: KVF_TOKEN
           valueFrom:

@@ -15,6 +15,7 @@ spec:
         command: ['kvf-minion']
         ports:
         - containerPort: 8080
+          name: http
         securityContext:
           capabilities:
             add: ['SYS_ADMIN']
