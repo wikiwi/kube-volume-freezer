@@ -8,7 +8,7 @@ GO_PACKAGE     ?= github.com/wikiwi/kube-volume-freezer
 REPOSITORY     ?= wikiwi/kube-volume-freezer
 
 ### Docker Tag settings ###
-LATEST_VERSION ?= 0.1
+LATEST_VERSION := 0.1
 
 ### Github Release Settings ###
 GITHUB_USER ?= wikiwi
@@ -16,7 +16,7 @@ GITHUB_REPO ?= kube-volume-freezer
 GITHUB_UPLOAD_CMD = github-release upload -u "$(GITHUB_USER)" -r "$(GITHUB_REPO)" -t "$(GIT_TAG)" -n "$(notdir $(FILE))" -f "$(FILE)"
 
 ### Coverage settings ###
-COVER_PACKAGES=$(shell cd pkg && go list -f '{{.ImportPath}}' ./... | tr '\n' ',' | sed 's/.$$//')
+COVER_PACKAGES = $(shell cd pkg && go list -f '{{.ImportPath}}' ./... | tr '\n' ',' | sed 's/.$$//')
 
 ### Build Tools ###
 GO ?= go
@@ -33,7 +33,7 @@ GLIDE_OPTS ?=
 GLIDE_GLOBAL_OPTS ?=
 
 ### Artifact settings for Github Release ###
-ARTIFACTS_ARCHIVES ?= kvfctl_linux_amd64.tar.bz2 \
+ARTIFACTS_ARCHIVES := kvfctl_linux_amd64.tar.bz2 \
                       kvfctl_darwin_amd64.tar.bz2 \
                       kvfctl_freebsd_amd64.tar.bz2 \
                       kvfctl_windows_amd64.zip
