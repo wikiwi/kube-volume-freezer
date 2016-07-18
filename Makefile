@@ -107,7 +107,7 @@ github-release:
 ifdef IS_DIRTY
 	$(error Current trunk is marked dirty)
 endif
-ifdef IS_RELEASE
+ifndef IS_RELEASE
 	@echo "Skipping release as this commit is not tagged as one"
 else
 	github-release release -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "${GIT_TAG}" || true
