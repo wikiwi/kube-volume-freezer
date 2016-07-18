@@ -110,6 +110,7 @@ endif
 ifndef IS_RELEASE
 	@echo "Skipping release as this commit is not tagged as one"
 else
+	${MAKE} artifacts
 	github-release release -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "${GIT_TAG}" || true
 	$(foreach FILE,$(wildcard artifacts/*),$(GITHUB_UPLOAD_CMD) || true;)
 endif
