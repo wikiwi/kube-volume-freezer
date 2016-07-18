@@ -7,6 +7,11 @@
 GO_PACKAGE      ?= github.com/wikiwi/kube-volume-freezer
 REPOSITORY      ?= registry.wikiwi.io/vinh/kube-volume-freezer
 
+### Github Release Settings ###
+GITHUB_USER ?= wikiwi
+GITHUB_REPO ?= kube-volume-freezer
+GITHUB_UPLOAD_CMD = github-release upload -u "$(GITHUB_USER)" -r "$(GITHUB_REPO)" -t "$(GIT_TAG)" -n "$(notdir $(FILE))" -f "$(FILE)"
+
 ### Build Tools ###
 GO ?= go
 GLIDE ?= glide
@@ -97,6 +102,17 @@ docker-push-%:
 # artifacts create
 .PHONY: artifacts
 artifacts: ${ARTIFACTS_TARGETS}
+
+github-release:
+ifdef IS_DIRTY
+	$(error Current trunk is marked dirty)
+endif
+ifdef IS_RELEASE
+	@echo "Skipping release as this commit is not tagged as one"
+else
+	github-release release -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "${GIT_TAG}" || true
+	$(foreach FILE,$(wildcard artifacts/*),$(GITHUB_UPLOAD_CMD) || true;)
+endif
 
 # clean deletes build artifacts from the project.
 .PHONY: clean
