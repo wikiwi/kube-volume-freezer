@@ -1,0 +1,32 @@
+language: go
+sudo: required
+go:
+  - 1.6
+services:
+  - docker
+
+install:
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/modocache/gover
+  - go get github.com/aktau/github-release
+
+script:
+  - set -eo pipefail
+  - make info
+  - make bootstrap
+  - if git log -1 | grep "\[ci cover\]"; then
+      make test-with-coverage;
+      goveralls -coverprofile=gover.coverprofile -service=travis-ci;
+    else
+      make test;
+    fi
+
+after_success:
+  - if [ "${TRAVIS_BRANCH}" == "master" ]; then
+      docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+      make docker-build;
+      make docker-push;
+      make github-release;
+    fi
+
