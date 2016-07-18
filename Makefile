@@ -4,8 +4,11 @@
 # of the MIT license. See the LICENSE file for details.
 
 ###  Configuration ###
-GO_PACKAGE      ?= github.com/wikiwi/kube-volume-freezer
-REPOSITORY      ?= wikiwi/kube-volume-freezer
+GO_PACKAGE     ?= github.com/wikiwi/kube-volume-freezer
+REPOSITORY     ?= wikiwi/kube-volume-freezer
+
+### Docker Tag settings ###
+LATEST_VERSION ?= 0.1
 
 ### Github Release Settings ###
 GITHUB_USER ?= wikiwi

@@ -23,9 +23,6 @@ ifndef IS_DIRTY
     IS_CANARY       := true
     ifeq (${GIT_TAG},${VERSION})
       IS_RELEASE      := true
-      ifeq (${LATEST},${VERSION_MINOR})
-        IS_LATEST := true
-      endif
     endif
   endif
 endif
@@ -55,8 +52,9 @@ ifdef IS_RELEASE
     TAGS := ${VERSION_MINOR}-${VERSION_STAGE} ${TAGS}
   else
     TAGS := ${VERSION_MINOR} ${TAGS}
-  endif
-  ifeq (${IS_LATEST},true)
-    TAGS := latest ${TAGS}
+    ifeq (${LATEST_VERSION},${VERSION_MINOR})
+      TAGS := latest ${TAGS}
+    endif
   endif
 endif
+
