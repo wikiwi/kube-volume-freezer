@@ -5,12 +5,15 @@
 
 ###  Configuration ###
 GO_PACKAGE      ?= github.com/wikiwi/kube-volume-freezer
-REPOSITORY      ?= registry.wikiwi.io/vinh/kube-volume-freezer
+REPOSITORY      ?= wikiwi/kube-volume-freezer
 
 ### Github Release Settings ###
 GITHUB_USER ?= wikiwi
 GITHUB_REPO ?= kube-volume-freezer
 GITHUB_UPLOAD_CMD = github-release upload -u "$(GITHUB_USER)" -r "$(GITHUB_REPO)" -t "$(GIT_TAG)" -n "$(notdir $(FILE))" -f "$(FILE)"
+
+### Coverage settings ###
+COVER_PACKAGES=$(shell cd pkg && go list -f '{{.ImportPath}}' ./... | tr '\n' ',' | sed 's/.$$//')
 
 ### Build Tools ###
 GO ?= go
@@ -20,6 +23,7 @@ DOCKER ?= docker
 TAR ?= tar
 ZIP ?= zip
 SHA256SUM ?= sha256sum
+GOVER ?= gover
 
 # Glide Options
 GLIDE_OPTS ?=
@@ -127,6 +131,12 @@ test:
 	cd pkg && go test ./...
 	echo Running integration tests
 	cd test && go test ./...
+
+.PHONY: test-with-coverage
+test-with-coverage:
+	cd pkg && go list -f "{{if len .TestGoFiles}}go test -coverpkg=\"${COVER_PACKAGES}\" -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}};{{end}}" ./... | sh
+	cd test && go list -f "{{if len .TestGoFiles}}go test -coverpkg=\"${COVER_PACKAGES}\" -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}};{{end}}" ./... | sh
+	${GOVER}
 
 # bootstrap will install project dependencies.
 .PHONY: bootstrap
