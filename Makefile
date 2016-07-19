@@ -70,14 +70,14 @@ artifacts/%.tar.bz2:
 	$(eval FILE := bin/$(word 2,$(subst _, ,$*))/$(word 3,$(subst _, ,$*))/$(word 1,$(subst _, ,$*)))
 	${MAKE} ${FILE}
 	mkdir -p artifacts
-	${TAR} -jcvf "$@" ${FILE}
+	cd $(dir ${FILE}) && ${TAR} -jcvf "${CURDIR}/$@" $(notdir ${FILE})
 artifacts/%.zip:
 	$(eval FILE := bin/$(word 2,$(subst _, ,$*))/$(word 3,$(subst _, ,$*))/$(word 1,$(subst _, ,$*)).exe)
 	${MAKE} ${FILE}
 	mkdir -p artifacts
-	${ZIP} "$@" "${FILE}"
+	cd $(dir ${FILE}) && ${ZIP} "${CURDIR}/$@" "$(notdir ${FILE})"
 
-artifacts/SHA256SUMS:
+artifacts/SHA256SUMS: $(ARTIFACTS_ARCHIVES:%=artifacts/%)
 	cd artifacts && ${SHA256SUM} ${ARTIFACTS_ARCHIVES} > $(notdir $@)
 
 .PHONY: build
