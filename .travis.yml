@@ -19,6 +19,10 @@ script:
   - set -eo pipefail
   - make info
   - make bootstrap
+  - if [ "${TRAVIS_SECURE_ENV_VARS}" == "false" ]; then
+      make test;
+      exit 0;
+    fi
   - if git log -1 | grep "\[ci cover\]"; then
       make test-with-coverage;
       goveralls -coverprofile=gover.coverprofile -service=travis-ci;
