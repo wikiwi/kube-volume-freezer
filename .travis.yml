@@ -5,6 +5,10 @@ go:
 services:
   - docker
 
+before_install:
+  - export MASTER_BRANCH=origin/master
+  - git fetch --depth=50 origin master:remotes/origin/master
+
 install:
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
@@ -23,10 +27,12 @@ script:
     fi
 
 after_success:
-  - if [ "${TRAVIS_BRANCH}" == "master" ]; then
+  - if make has-tags; then
       docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
       make docker-build;
       make docker-push;
+    fi
+  - if [ -n "${TRAVIS_TAG}" ]; then
       make github-release;
     fi
 

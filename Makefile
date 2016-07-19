@@ -13,7 +13,7 @@ LATEST_VERSION := 0.1
 ### Github Release Settings ###
 GITHUB_USER ?= wikiwi
 GITHUB_REPO ?= kube-volume-freezer
-GITHUB_UPLOAD_CMD = github-release upload -u "$(GITHUB_USER)" -r "$(GITHUB_REPO)" -t "$(GIT_TAG)" -n "$(notdir $(FILE))" -f "$(FILE)"
+GITHUB_UPLOAD_CMD = github-release upload -u "$(GITHUB_USER)" -r "$(GITHUB_REPO)" -t "$(GIT_TAG)" -n "%" -f "%"
 
 ### Coverage settings ###
 COVER_PACKAGES = $(shell cd pkg && go list -f '{{.ImportPath}}' ./... | tr '\n' ',' | sed 's/.$$//')
@@ -119,7 +119,14 @@ ifndef IS_RELEASE
 else
 	${MAKE} artifacts
 	github-release release -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "${GIT_TAG}" $$(test -n "${VERSION_STAGE}" && echo --pre-release) || true
-	$(foreach FILE,$(wildcard artifacts/*),$(GITHUB_UPLOAD_CMD) || true;)
+	cd artifacts && ls | xargs -t -I % $(GITHUB_UPLOAD_CMD) || true;
+endif
+
+.PHONY: has-tags
+has-tags:
+ifndef TAGS
+	@echo No tags set for this build
+	false
 endif
 
 # clean deletes build artifacts from the project.

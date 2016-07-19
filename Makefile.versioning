@@ -21,9 +21,9 @@ IS_DIRTY := $(shell ${GIT} status --porcelain)
 ifndef IS_DIRTY
   ifeq (${GIT_SHA},${GIT_SHA_MASTER})
     IS_CANARY       := true
-    ifeq (${GIT_TAG},${VERSION})
-      IS_RELEASE      := true
-    endif
+  endif
+  ifeq (${GIT_TAG},${VERSION})
+    IS_RELEASE      := true
   endif
 endif
 
