@@ -5,6 +5,11 @@ go:
 services:
   - docker
 
+cache:
+  directories:
+  - vendor
+  - $HOME/gopath/pkg
+
 before_install:
   - export MASTER_BRANCH=origin/master
   - git fetch --depth=50 origin master:remotes/origin/master

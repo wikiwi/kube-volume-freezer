@@ -27,6 +27,7 @@ TAR ?= tar
 ZIP ?= zip
 SHA256SUM ?= sha256sum
 GOVER ?= gover
+GITHUB_RELEASE ?= github-release
 
 # Glide Options
 GLIDE_OPTS ?=
@@ -110,6 +111,7 @@ docker-push-%:
 .PHONY: artifacts
 artifacts: ${ARTIFACTS_TARGETS}
 
+.PHONY: github-release
 github-release:
 ifdef IS_DIRTY
 	$(error Current trunk is marked dirty)
@@ -118,7 +120,7 @@ ifndef IS_RELEASE
 	@echo "Skipping release as this commit is not tagged as one"
 else
 	${MAKE} artifacts
-	github-release release -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "${GIT_TAG}" $$(test -n "${VERSION_STAGE}" && echo --pre-release) || true
+	${GITHUB_RELEASE} release -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "${GIT_TAG}" $$(test -n "${VERSION_STAGE}" && echo --pre-release) || true
 	cd artifacts && ls | xargs -t -I % $(GITHUB_UPLOAD_CMD) || true;
 endif
 
@@ -138,14 +140,14 @@ clean:
 .PHONY: test
 test:
 	echo Running unit tests
-	cd pkg && go test ./...
+	cd pkg && go test -i ./... && go test ./...
 	echo Running integration tests
-	cd test && go test ./...
+	cd test && go test -i ./... && go test ./...
 
 .PHONY: test-with-coverage
 test-with-coverage:
-	cd pkg && go list -f "{{if len .TestGoFiles}}go test -coverpkg=\"${COVER_PACKAGES}\" -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}};{{end}}" ./... | sh
-	cd test && go list -f "{{if len .TestGoFiles}}go test -coverpkg=\"${COVER_PACKAGES}\" -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}};{{end}}" ./... | sh
+	cd pkg && go test -i ./... && go list -f "{{if len .TestGoFiles}}go test -coverpkg=\"${COVER_PACKAGES}\" -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}};{{end}}" ./... | sh
+	cd test && go test -i ./... && go list -f "{{if len .TestGoFiles}}go test -coverpkg=\"${COVER_PACKAGES}\" -coverprofile={{.Dir}}/.coverprofile {{.ImportPath}};{{end}}" ./... | sh
 	${GOVER}
 
 # bootstrap will install project dependencies.
