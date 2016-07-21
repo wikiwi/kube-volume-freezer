@@ -1,13 +1,6 @@
-FROM golang:1.6
+FROM alpine:3.4
 
-ENV GO_PACKAGE=github.com/wikiwi/kube-volume-freezer
+RUN apk --no-cache add  util-linux
 
-RUN mkdir -p /go/src/${GO_PACKAGE}
-COPY . /go/src/${GO_PACKAGE}
-
-WORKDIR /go/src/${GO_PACKAGE}
-
-RUN make bootstrap build && \
-    mv /go/src/${GO_PACKAGE}/bin/* /go/bin/ && \
-    rm -rf /go/pkg
+COPY bin/linux/amd64/ /usr/bin/
 

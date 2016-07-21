@@ -98,7 +98,7 @@ build-for-docker: ${BINARIES:%= bin/linux/amd64/%}
 # docker-build will build the docker image.
 .PHONY: docker-build
 docker-build: build-for-docker
-	${DOCKER} build --pull -t ${IMAGE} -f Dockerfile.alpine .
+	${DOCKER} build --pull -t ${IMAGE} .
 
 # docker-push will push all tags to the repository
 .PHONY: docker-push
