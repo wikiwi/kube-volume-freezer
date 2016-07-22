@@ -13,7 +13,7 @@ LATEST_VERSION := 0.1
 ### Github Release Settings ###
 GITHUB_USER ?= wikiwi
 GITHUB_REPO ?= kube-volume-freezer
-GITHUB_UPLOAD_CMD = github-release upload -u "$(GITHUB_USER)" -r "$(GITHUB_REPO)" -t "$(GIT_TAG)" -n "%" -f "%"
+GITHUB_UPLOAD_CMD = github-release upload -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "%" -f "%"
 
 ### Coverage settings ###
 COVER_PACKAGES = $(shell cd pkg && go list -f '{{.ImportPath}}' ./... | tr '\n' ',' | sed 's/.$$//')
@@ -39,7 +39,7 @@ ARTIFACTS_ARCHIVES := kvfctl_linux_amd64.tar.bz2 \
                       kvfctl_freebsd_amd64.tar.bz2 \
                       kvfctl_windows_amd64.zip
 
-ARTIFACTS_TARGETS := $(ARTIFACTS_ARCHIVES:%=artifacts/%) artifacts/SHA256SUMS
+ARTIFACTS_TARGETS := ${ARTIFACTS_ARCHIVES:%=artifacts/%} artifacts/SHA256SUMS
 
 ### CI Settings ###
 # Set branch with most current HEAD of master e.g. master or origin/master.
@@ -78,7 +78,7 @@ artifacts/%.zip:
 	mkdir -p artifacts
 	cd $(dir ${FILE}) && ${ZIP} "${CURDIR}/$@" "$(notdir ${FILE})"
 
-artifacts/SHA256SUMS: $(ARTIFACTS_ARCHIVES:%=artifacts/%)
+artifacts/SHA256SUMS: ${ARTIFACTS_ARCHIVES:%=artifacts/%}
 	cd artifacts && ${SHA256SUM} ${ARTIFACTS_ARCHIVES} > $(notdir $@)
 
 .PHONY: build
@@ -121,7 +121,7 @@ ifndef IS_RELEASE
 else
 	${MAKE} artifacts
 	${GITHUB_RELEASE} release -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "${GIT_TAG}" $$(test -n "${VERSION_STAGE}" && echo --pre-release) || true
-	cd artifacts && ls | xargs -t -I % $(GITHUB_UPLOAD_CMD) || true;
+	cd artifacts && ls | xargs -t -I % ${GITHUB_UPLOAD_CMD} || true;
 endif
 
 .PHONY: has-tags

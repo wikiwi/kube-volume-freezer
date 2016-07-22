@@ -31,7 +31,7 @@ endif
 ifdef IS_DIRTY
   BUILD_REF      := ${GIT_SHA_SHORT}-dirty
 else
-  BUILD_REF      := $(GIT_SHA_SHORT)
+  BUILD_REF      := ${GIT_SHA_SHORT}
 endif
 
 # BUILD_VERSION will be compiled into the projects binaries.

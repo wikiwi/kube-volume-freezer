@@ -5,7 +5,7 @@
 
 # go build targets
 #
-BUILD_CMD = CGO_ENABLED=0 ${GO} build -ldflags "-X ${GO_PACKAGE}/pkg/version.Version=${BUILD_VERSION}" -o "$@" $(GO_PACKAGE)/cmd/$(basename $(notdir $@))
+BUILD_CMD = CGO_ENABLED=0 ${GO} build -ldflags "-X ${GO_PACKAGE}/pkg/version.Version=${BUILD_VERSION}" -o "$@" ${GO_PACKAGE}/cmd/$(basename $(notdir $@))
 
 # arm
 ${BINARIES:%=bin/linux/arm/5/%}:
