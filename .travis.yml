@@ -5,6 +5,10 @@ go:
 services:
   - docker
 
+notifications:
+  slack:
+    secure: BOWbEtnhETJcg03+wNPAoUxp73e5qBG1Len/qYX/SoR/3A7MSnBJw9Zs7wGiSzKVU75I+hQnjKanbeYVZ26+O+LXhDYNIuossnsE+QG4EpWuWfLR+QKXOvhVm+wMazkTVC0q3qk0TCF/BT/R780wrTQFUKCeEe2UVGF7XCjxIiMpnSxKeBIkNXFOV/MoBkDCKRradHwpL7MroC1ncT0C+JZlXzvupjvccvJIISFHOiU+je5P7UWy1+yo6vBV/y7rZBO4gkpm5plOnRt+7QQzV0x05gBHbxARzUpCgyNd1S864a7Q8Snt4WECvbhtj7MvVzuuZhbrdGldNdVm+piFOgt/Oz/7WOv8AUWOPssfRjMl0vUdmAGjMvOfIl8o8CmI4u1jNR0X5Yu7I5zltDGnLBQbcCKLeJaBWbHuF/8CYWrHQf+Kw1CcP+IW6cWeglBNO63SLEwjRk7WC+NRnZp+irOdlmAylDBvRqQvLHQ0Mz2c023PWEF7FsFRM6f0Fvch4BUePdIMzNNQKNk2ddI2Pn32bVole4/4xK51DRRWXocII4X0KHWFjZfc0Zpo/ArzjDgsbT+M0faKgPK9NgRFD/1FRAsNrzIyq4DO/Em6mPPNkcUngdwOdi3onGQRWNAxOR/c6pjORGmWEA1ZlUeYsvZLnVLwLJpXlxYCTkHurMY=
+
 cache:
   directories:
   - vendor
