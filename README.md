@@ -1,7 +1,11 @@
 # kube-volume-freezer
 To be written...
 
-[![Build Status Widget]][Build Status] [![GoDoc Widget]][GoDoc] [![Coverage Status Widget]][Coverage Status] [![Code Climate Widget]][Code Climate] [![Docker Hub Widget]][Docker Hub]
+[![Build Status Widget]][Build Status]
+[![GoDoc Widget]][GoDoc]
+[![Coverage Status Widget]][Coverage Status]
+[![Code Climate Widget]][Code Climate]
+[![MicroBadger Version Widget]][MicroBadger Version]
 
 [Build Status]: https://travis-ci.org/wikiwi/kube-volume-freezer
 [Build Status Widget]: https://travis-ci.org/wikiwi/kube-volume-freezer.svg?branch=master
@@ -11,5 +15,7 @@ To be written...
 [Coverage Status Widget]: https://coveralls.io/repos/github/wikiwi/kube-volume-freezer/badge.svg?branch=master
 [Code Climate]: https://codeclimate.com/github/wikiwi/kube-volume-freezer
 [Code Climate Widget]: https://codeclimate.com/github/wikiwi/kube-volume-freezer/badges/gpa.svg
-[Docker Hub]: https://hub.docker.com/r/wikiwi/kube-volume-freezer
-[Docker Hub Widget]: https://img.shields.io/docker/pulls/wikiwi/kube-volume-freezer.svg
+[MicroBadger Version]: http://microbadger.com/#/images/wikiwi/kube-volume-freezer
+[MicroBadger Version Widget]: https://images.microbadger.com/badges/version/wikiwi/kube-volume-freezer.svg
+
+
