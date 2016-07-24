@@ -3,35 +3,25 @@
 # This software may be modified and distributed under the terms
 # of the MIT license. See the LICENSE file for details.
 
-###  Configuration ###
-GO_PACKAGE     ?= github.com/wikiwi/kube-volume-freezer
-REPOSITORY     ?= wikiwi/kube-volume-freezer
-
-### Docker Tag settings ###
-LATEST_VERSION := 0.1
-
-### Github Release Settings ###
+### GitHub settings ###
 GITHUB_USER ?= wikiwi
 GITHUB_REPO ?= kube-volume-freezer
+
 GITHUB_UPLOAD_CMD = github-release upload -u "${GITHUB_USER}" -r "${GITHUB_REPO}" -t "${GIT_TAG}" -n "%" -f "%"
 
-### Coverage settings ###
-COVER_PACKAGES = $(shell cd pkg && go list -f '{{.ImportPath}}' ./... | tr '\n' ',' | sed 's/.$$//')
+### Docker settings ###
+DOCKER_REPO    ?= wikiwi/kube-volume-freezer
+LATEST_VERSION := 0.1
 
-### Build Tools ###
-GO ?= go
-GLIDE ?= glide
-GIT ?= git
-DOCKER ?= docker
-TAR ?= tar
-ZIP ?= zip
-SHA256SUM ?= sha256sum
-GOVER ?= gover
-GITHUB_RELEASE ?= github-release
+### GO settings ###
+GO_PACKAGE  ?= github.com/${GITHUB_USER}/${GITHUB_REPO}
 
-# Glide Options
+# Glide options
 GLIDE_OPTS ?=
 GLIDE_GLOBAL_OPTS ?=
+
+# Coverage settings
+COVER_PACKAGES = $(shell cd pkg && go list -f '{{.ImportPath}}' ./... | tr '\n' ',' | sed 's/.$$//')
 
 ### Artifact settings for Github Release ###
 ARTIFACTS_ARCHIVES := kvfctl_linux_amd64.tar.bz2 \
@@ -46,6 +36,17 @@ ARTIFACTS_TARGETS := ${ARTIFACTS_ARCHIVES:%=artifacts/%} artifacts/SHA256SUMS
 # E.g. Gitlab doesn't pull the master branch but fetches it to origin/master.
 MASTER_BRANCH ?= master
 
+### Build Tools ###
+GO ?= go
+GLIDE ?= glide
+GIT ?= git
+DOCKER ?= docker
+TAR ?= tar
+ZIP ?= zip
+SHA256SUM ?= sha256sum
+GOVER ?= gover
+GITHUB_RELEASE ?= github-release
+
 ### Environment ###
 HAS_GLIDE := $(shell command -v ${GLIDE};)
 HAS_GIT := $(shell command -v ${GIT};)
@@ -58,7 +59,7 @@ BINARIES := $(notdir $(wildcard cmd/*))
 include Makefile.versioning
 
 # Docker Image info.
-IMAGE := ${REPOSITORY}:${BUILD_REF}
+IMAGE := ${DOCKER_REPO}:${BUILD_REF}
 
 # Show build info.
 info:
@@ -99,13 +100,19 @@ build-for-docker: ${BINARIES:%= bin/linux/amd64/%}
 # docker-build will build the docker image.
 .PHONY: docker-build
 docker-build: build-for-docker
-	${DOCKER} build --pull -t ${IMAGE} .
+	${DOCKER} build --pull -t ${IMAGE} \
+		--build-arg "BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`" \
+		--build-arg "VCS_REF=${GIT_SHA}" \
+		--build-arg "VCS_VERSION=${BUILD_VERSION}" \
+		--build-arg "VCS_MESSAGE=$$(git log --oneline -n1 --pretty=%B | head -n1)" \
+		--build-arg "BUILD_URL=$$(test -n "$${TRAVIS_BUILD_ID}" && echo https://travis-ci.org/${GITHUB_USER}/${GITHUB_REPO}/builds/$${TRAVIS_BUILD_ID})" \
+		.
 
 # docker-push will push all tags to the repository
 .PHONY: docker-push
 docker-push: ${TAGS:%=docker-push-%}
 docker-push-%:
-	${DOCKER} tag ${IMAGE} ${REPOSITORY}:$* && docker push ${REPOSITORY}:$*
+	${DOCKER} tag ${IMAGE} ${DOCKER_REPO}:$* && docker push ${DOCKER_REPO}:$*
 
 # artifacts create
 .PHONY: artifacts

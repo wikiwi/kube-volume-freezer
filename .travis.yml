@@ -19,10 +19,21 @@ before_install:
   - git fetch --depth=50 origin master:remotes/origin/master
 
 install:
-  - go get github.com/mattn/goveralls
-  - go get golang.org/x/tools/cmd/cover
-  - go get github.com/modocache/gover
-  - go get github.com/aktau/github-release
+  - if git log -1 | grep "\[ci cover\]"; then
+      go get github.com/mattn/goveralls;
+      go get golang.org/x/tools/cmd/cover;
+      go get github.com/modocache/gover;
+    fi
+  - if make has-tags; then
+      sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D;
+      sudo sh -c 'echo "deb https://apt.dockerproject.org/repo ubuntu-trusty main" > /etc/apt/sources.list.d/docker.list';
+      sudo apt-get update;
+      sudo apt-get -qqy -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install docker-engine=1.11.2-0~trusty;
+      docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    fi
+  - if [ -n "${TRAVIS_TAG}" ]; then
+      go get github.com/aktau/github-release;
+    fi
 
 script:
   - set -eo pipefail
@@ -44,6 +55,7 @@ after_success:
       docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
       make docker-build;
       make docker-push;
+      curl -X POST "${MICROBADGER_URL}";
     fi
   - if [ -n "${TRAVIS_TAG}" ]; then
       make github-release;
