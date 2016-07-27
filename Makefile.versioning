@@ -45,6 +45,9 @@ endif
 TAGS :=
 ifeq (${IS_CANARY},true)
   TAGS := canary ${TAGS}
+  ifeq (${LATEST_VERSION},canary)
+    TAGS := latest ${TAGS}
+  endif
 endif
 ifdef IS_RELEASE
   TAGS := ${VERSION} ${TAGS}
