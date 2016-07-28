@@ -11,7 +11,7 @@ import (
 	"github.com/emicklei/go-restful"
 
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/volumes"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/volumes"
 	"github.com/wikiwi/kube-volume-freezer/pkg/rest"
 	"github.com/wikiwi/kube-volume-freezer/pkg/validation"
 )

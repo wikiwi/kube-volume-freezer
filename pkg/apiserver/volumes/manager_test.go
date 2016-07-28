@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes/k8stest"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/kubernetes"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/kubernetes/k8stest"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/client"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/client/clienttest"
 	"github.com/wikiwi/kube-volume-freezer/pkg/util/diff"

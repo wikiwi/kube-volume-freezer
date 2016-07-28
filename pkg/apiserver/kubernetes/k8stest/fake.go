@@ -11,7 +11,7 @@ import (
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/errors"
 
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/kubernetes"
 )
 
 var _ kubernetes.Service = new(Fake)

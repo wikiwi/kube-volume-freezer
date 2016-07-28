@@ -1,21 +1,21 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: kube-volume-freezer-master
+  name: kube-volume-freezer-apiserver
 spec:
   replicas: 1
   template:
     metadata:
       labels:
         app: kube-volume-freezer
-        component: master
+        component: apiserver
     spec:
       securityContext:
         runAsUser: 10000
       containers:
-      - name: master
+      - name: apiserver
         image: wikiwi/kube-volume-freezer:0.1
-        command: ['kvf-master']
+        command: ['kvf-apiserver']
         ports:
         - containerPort: 8080
           name: http
@@ -24,7 +24,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: kube-volume-freezer-secret
-              key: master-token
+              key: apiserver-token
         - name: KVF_MINION_TOKEN
           valueFrom:
             secretKeyRef:

@@ -13,7 +13,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
 	"github.com/wikiwi/kube-volume-freezer/pkg/client/clienttest"
 	"github.com/wikiwi/kube-volume-freezer/pkg/client/generic"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/volumes/volumestest"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/volumes/volumestest"
 	"github.com/wikiwi/kube-volume-freezer/pkg/rest"
 	"github.com/wikiwi/kube-volume-freezer/pkg/rest/resttest"
 )

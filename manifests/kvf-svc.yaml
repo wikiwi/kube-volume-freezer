@@ -11,5 +11,5 @@ spec:
     name: http
   selector:
     app: kube-volume-freezer
-    component: master
+    component: apiserver
 

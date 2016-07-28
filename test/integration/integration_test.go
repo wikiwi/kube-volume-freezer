@@ -22,9 +22,9 @@ import (
 	"k8s.io/kubernetes/pkg/runtime"
 
 	"github.com/wikiwi/kube-volume-freezer/pkg/api"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver"
 	clientpkg "github.com/wikiwi/kube-volume-freezer/pkg/client"
 	"github.com/wikiwi/kube-volume-freezer/pkg/client/generic"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/fs/fstest"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/volumes"
@@ -57,16 +57,16 @@ var _ = Describe("Server", func() {
 		volumes.PodsBasePath + "/22222222-2222-2222-2222-222222222222/volumes/kubernetes.io~gce-pd/pd1",
 	}
 
-	var masterToken string
-	var master2MinionToken string
+	var apiserverToken string
+	var apiserver2MinionToken string
 	var minionToken string
 	var minionSelector string
 	var minionNamespace string
 	var clientToken string
 
 	var resetConfig = func() {
-		masterToken = ""
-		master2MinionToken = ""
+		apiserverToken = ""
+		apiserver2MinionToken = ""
 		minionToken = ""
 		minionSelector = "abc=123"
 		minionNamespace = "default"
@@ -75,7 +75,7 @@ var _ = Describe("Server", func() {
 	resetConfig()
 
 	var minionServer *httptest.Server
-	var masterServer *httptest.Server
+	var apiserverServer *httptest.Server
 	var client clientpkg.Interface
 	var fsFake *fstest.FakeFS
 
@@ -97,7 +97,7 @@ var _ = Describe("Server", func() {
 			panic(err)
 		}
 
-		// Setup master.
+		// Setup apiserver.
 		fakeClient := testclient.NewSimpleFake(k8sFixture...)
 		fakeClient.PrependReactor("get", "*", func(action testclient.Action) (handled bool, ret runtime.Object, err error) {
 			a := action.(testclient.GetAction)
@@ -106,27 +106,27 @@ var _ = Describe("Server", func() {
 			}
 			return false, nil, nil
 		})
-		masterRESTServer, err := master.NewRESTServer(&master.Options{
-			Token:           masterToken,
+		apiserverRESTServer, err := apiserver.NewRESTServer(&apiserver.Options{
+			Token:           apiserverToken,
 			MinionNamespace: minionNamespace,
 			MinionSelector:  minionSelector,
 			MinionPort:      port,
-			MinionToken:     master2MinionToken,
+			MinionToken:     apiserver2MinionToken,
 			KubeClient:      fakeClient,
 		})
 		if err != nil {
 			panic(err)
 		}
-		masterServer = httptest.NewServer(masterRESTServer.Handler())
+		apiserverServer = httptest.NewServer(apiserverRESTServer.Handler())
 
-		client, err = clientpkg.New(masterServer.URL, &clientpkg.Options{Token: clientToken})
+		client, err = clientpkg.New(apiserverServer.URL, &clientpkg.Options{Token: clientToken})
 		if err != nil {
 			panic(err)
 		}
 	})
 
 	AfterEach(func() {
-		masterServer.Close()
+		apiserverServer.Close()
 		minionServer.Close()
 		resetConfig()
 	})
@@ -233,10 +233,10 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe("swagger", func() {
-		Context("master", func() {
+		Context("apiserver", func() {
 			It("should return swagger spec at /apidocs.json", func() {
 				var json interface{}
-				client := generic.NewOrDie(masterServer.URL, nil)
+				client := generic.NewOrDie(apiserverServer.URL, nil)
 				req := client.NewRequestOrDie("GET", "/apidocs.json", nil)
 				_, err := client.Do(req, &json)
 				Expect(err).To(BeNil())
@@ -256,10 +256,10 @@ var _ = Describe("Server", func() {
 	})
 
 	Describe("health", func() {
-		Context("master", func() {
+		Context("apiserver", func() {
 			It("should report health status at /healthz", func() {
 				var health api.Health
-				client := generic.NewOrDie(masterServer.URL, nil)
+				client := generic.NewOrDie(apiserverServer.URL, nil)
 				req := client.NewRequestOrDie("GET", "/healthz", nil)
 				_, err := client.Do(req, &health)
 				Expect(err).To(BeNil())
@@ -281,9 +281,9 @@ var _ = Describe("Server", func() {
 	Describe("auth", func() {
 		Context("with auth turned on", func() {
 			BeforeEach(func() {
-				masterToken = "protectedMaster"
+				apiserverToken = "protectedAPIServer"
 				minionToken = "protectedMinion"
-				master2MinionToken = minionToken
+				apiserver2MinionToken = minionToken
 			})
 			Context("without credentials", func() {
 				It("should block unauthenticated requests to resources", func() {
@@ -291,8 +291,8 @@ var _ = Describe("Server", func() {
 					Expect(err).To(BeAssignableToTypeOf(&api.Error{}))
 					Expect(err.(*api.Error).Code).To(Equal(403))
 				})
-				It("should allow health requests to master", func() {
-					client := generic.NewOrDie(masterServer.URL, nil)
+				It("should allow health requests to apiserver", func() {
+					client := generic.NewOrDie(apiserverServer.URL, nil)
 					req := client.NewRequestOrDie("GET", "/healthz", nil)
 					_, err := client.Do(req, nil)
 					Expect(err).To(BeNil())
@@ -303,8 +303,8 @@ var _ = Describe("Server", func() {
 					_, err := client.Do(req, nil)
 					Expect(err).To(BeNil())
 				})
-				It("should allow swagger requests to master", func() {
-					client := generic.NewOrDie(masterServer.URL, nil)
+				It("should allow swagger requests to apiserver", func() {
+					client := generic.NewOrDie(apiserverServer.URL, nil)
 					req := client.NewRequestOrDie("GET", "/apidocs.json", nil)
 					_, err := client.Do(req, nil)
 					Expect(err).To(BeNil())
@@ -318,7 +318,7 @@ var _ = Describe("Server", func() {
 			})
 			Context("with credentials", func() {
 				BeforeEach(func() {
-					clientToken = "protectedMaster"
+					clientToken = "protectedAPIServer"
 				})
 				It("should allow authenticated requests", func() {
 					_, err := client.Volumes().List("default", "pod1")
@@ -329,17 +329,17 @@ var _ = Describe("Server", func() {
 		Context("with only minion auth turned on", func() {
 			BeforeEach(func() {
 				minionToken = "protectedMinion"
-				master2MinionToken = minionToken
+				apiserver2MinionToken = minionToken
 			})
 			It("should allow all requests", func() {
 				_, err := client.Volumes().List("default", "pod1")
 				Expect(err).To(BeNil())
 			})
 		})
-		Context("with auth turned on but wrong master2MinionToken ", func() {
+		Context("with auth turned on but wrong apiserver2MinionToken ", func() {
 			BeforeEach(func() {
 				minionToken = "protectedMinion"
-				master2MinionToken = "wrongToken"
+				apiserver2MinionToken = "wrongToken"
 			})
 			It("should return 403", func() {
 				_, err := client.Volumes().List("default", "pod1")

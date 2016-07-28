@@ -5,16 +5,16 @@
  * of the MIT license. See the LICENSE file for details.
  */
 
-// Package master contains the implementation of the Master Server.
-package master
+// Package apiserver contains the implementation of the Master Server.
+package apiserver
 
 import (
 	"k8s.io/kubernetes/pkg/client/unversioned"
 
 	"github.com/wikiwi/kube-volume-freezer/pkg/log"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/controllers"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/volumes"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/controllers"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/kubernetes"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/volumes"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/client"
 	"github.com/wikiwi/kube-volume-freezer/pkg/rest"
 	utilk8s "github.com/wikiwi/kube-volume-freezer/pkg/util/kubernetes"

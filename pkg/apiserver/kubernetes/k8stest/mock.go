@@ -10,7 +10,7 @@ package k8stest
 import (
 	"github.com/stretchr/testify/mock"
 
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/kubernetes"
 )
 
 var _ kubernetes.Service = new(Mock)

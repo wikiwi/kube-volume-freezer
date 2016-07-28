@@ -15,7 +15,7 @@ import (
 	"github.com/wikiwi/kube-volume-freezer/pkg/api/errors"
 	"github.com/wikiwi/kube-volume-freezer/pkg/api/issues"
 	"github.com/wikiwi/kube-volume-freezer/pkg/log"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master/kubernetes"
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver/kubernetes"
 	"github.com/wikiwi/kube-volume-freezer/pkg/minion/client"
 )
 

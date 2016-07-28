@@ -5,7 +5,7 @@
  * of the MIT license. See the LICENSE file for details.
  */
 
-// kvf-master starts the Master API Server.
+// kvf-api-server starts the API Server.
 package main
 
 import (
@@ -14,8 +14,8 @@ import (
 
 	"github.com/jessevdk/go-flags"
 
+	"github.com/wikiwi/kube-volume-freezer/pkg/apiserver"
 	"github.com/wikiwi/kube-volume-freezer/pkg/log"
-	"github.com/wikiwi/kube-volume-freezer/pkg/master"
 	"github.com/wikiwi/kube-volume-freezer/pkg/version"
 )
 
@@ -48,7 +48,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	server, err := master.NewRESTServer(&master.Options{
+	server, err := apiserver.NewRESTServer(&apiserver.Options{
 		Token:           opts.Token,
 		MinionToken:     opts.MinionToken,
 		MinionSelector:  opts.MinionSelector,
