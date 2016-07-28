@@ -10,8 +10,6 @@ spec:
         app: kube-volume-freezer
         component: apiserver
     spec:
-      securityContext:
-        runAsUser: 10000
       containers:
       - name: apiserver
         image: wikiwi/kube-volume-freezer:0.1
