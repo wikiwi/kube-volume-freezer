@@ -29,7 +29,7 @@ var opts struct {
 func main() {
 	var parser = flags.NewParser(&opts, flags.Default)
 	parser.Name = "kvf-minion"
-	parser.LongDescription = "Run minion server. This should be run in a Kubernetes Pod on each Node of the Cluster."
+	parser.LongDescription = "Runs the Minion server. This should be run in a Kubernetes Pod on each Node of the Cluster."
 
 	_, err := parser.Parse()
 	if err != nil {

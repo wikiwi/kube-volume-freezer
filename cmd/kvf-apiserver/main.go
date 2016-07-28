@@ -32,9 +32,8 @@ var opts struct {
 
 func main() {
 	var parser = flags.NewParser(&opts, flags.Default)
-	parser.Name = "kvf-minion"
-	parser.LongDescription = "Run minion server. This should be run in a Kubernetes Pod on each Node of the Cluster."
-
+	parser.Name = "kvf-apiserver"
+	parser.LongDescription = "Runs the API server. Delegates freeze, and thaw requests to the Minion containing the Pod."
 	_, err := parser.Parse()
 	if err != nil {
 		if e2, ok := err.(*flags.Error); ok && e2.Type == flags.ErrHelp {

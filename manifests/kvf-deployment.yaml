@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: apiserver
-        image: wikiwi/kube-volume-freezer:0.1
+        image: wikiwi/kube-volume-freezer
         command: ['kvf-apiserver']
         ports:
         - containerPort: 8080
