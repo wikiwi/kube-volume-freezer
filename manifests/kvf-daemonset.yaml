@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: minion
-        image: wikiwi/kube-volume-freezer:
+        image: wikiwi/kube-volume-freezer:0.1.0
         command: ['kvf-minion']
         ports:
         - containerPort: 8080
