@@ -11,7 +11,7 @@ GITHUB_UPLOAD_CMD = github-release upload -u "${GITHUB_USER}" -r "${GITHUB_REPO}
 
 ### Docker settings ###
 DOCKER_REPO    ?= wikiwi/kube-volume-freezer
-LATEST_VERSION ?= 0.1.0
+LATEST_VERSION ?=
 
 ### GO settings ###
 GO_PACKAGE  ?= github.com/${GITHUB_USER}/${GITHUB_REPO}

@@ -51,6 +51,9 @@ ifeq (${IS_CANARY},true)
 endif
 ifdef IS_RELEASE
   TAGS := ${VERSION} ${TAGS}
+  ifeq (${LATEST_VERSION},${VERSION})
+      TAGS := latest ${TAGS}
+  endif
   ifdef VERSION_STAGE
     TAGS := ${VERSION_MINOR}-${VERSION_STAGE} ${TAGS}
   else
