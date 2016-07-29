@@ -17,4 +17,4 @@ package version
 // Stage is added during development and is one of (pre-alpha|alpha|beta|rc)
 // accompanied by its iteration number. The trailing '+' sign is only removed
 // during a release.
-var Version = "0.1.0"
+var Version = "0.2.0-alpha.1+"
