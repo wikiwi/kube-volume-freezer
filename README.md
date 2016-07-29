@@ -5,7 +5,8 @@ Freeze Pod Volumes in Kubernetes for the purpose of producing a live snapshot.
 [![GoDoc Widget]][GoDoc]
 [![Coverage Status Widget]][Coverage Status]
 [![Code Climate Widget]][Code Climate]
-[![MicroBadger Version Widget]][MicroBadger Version]
+[![MicroBadger Version Widget]][MicroBadger URL]
+[![MicroBadger Image Widget]][MicroBadger URL]
 
 [Build Status]: https://travis-ci.org/wikiwi/kube-volume-freezer
 [Build Status Widget]: https://travis-ci.org/wikiwi/kube-volume-freezer.svg?branch=master
@@ -15,8 +16,9 @@ Freeze Pod Volumes in Kubernetes for the purpose of producing a live snapshot.
 [Coverage Status Widget]: https://coveralls.io/repos/github/wikiwi/kube-volume-freezer/badge.svg?branch=master
 [Code Climate]: https://codeclimate.com/github/wikiwi/kube-volume-freezer
 [Code Climate Widget]: https://codeclimate.com/github/wikiwi/kube-volume-freezer/badges/gpa.svg
-[MicroBadger Version]: http://microbadger.com/#/images/wikiwi/kube-volume-freezer
+[MicroBadger URL]: http://microbadger.com/#/images/wikiwi/kube-volume-freezer
 [MicroBadger Version Widget]: https://images.microbadger.com/badges/version/wikiwi/kube-volume-freezer.svg
+[MicroBadger Image Widget]: https://images.microbadger.com/badges/image/wikiwi/kube-volume-freezer.svg
 
 ## Use-Case
 - You want to sync and freeze one or multiple Kubernetes Pod Volumes before creating a live snapshot without adding additional capabilities to your Pods. ([GCE-Guide on creating snapshots](https://cloud.google.com/compute/docs/disks/create-snapshots))
